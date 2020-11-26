@@ -51,4 +51,19 @@ public class DrivetrainSubsystem {
     armServo.setPosition(0);
     clawServo.setPosition(1);
   }
+  
+  /**
+   * Resets the encoders of the drivetrain
+   */
+  public void resetEncoders() {
+    leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODERS);
+    rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODERS);
+    leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODERS);
+    rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODERS);
+    
+    leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+    rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+    leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+    rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+  }
 }
