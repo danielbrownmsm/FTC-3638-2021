@@ -8,8 +8,8 @@ public class Robot {
   private Servo clawServo;
   
   private BNO055IMU.Parameters imuParameters;
-  private double driveKp = 0.05; // need to tune
-  private double turnKp = 0.05; // need to tune
+  private double drive_kP = 0.05; // need to tune
+  private double turn_kP = 0.05; // need to tune
   
   private HardwareMap map;
   
@@ -123,13 +123,29 @@ public class Robot {
   /**
    * Drives the robot on the last taken heading (so, straight) the distance given in inches
    */
-  private void driveDistance(double inches) {
+  public void driveDistance(double inches) {
     resetEncoders(); // reset encoders so we start fresh
-    float lastHeading = imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle; // get the reference angle we will try to P to
+    float lastHeading = getYaw(); // get the reference angle we will try to P to
     while (!(Math.abs(getEncoderAverage()) >= inches) || linearOpMode.isStopRequested()) { // idk if this linear op mode thing will work here
       arcadeDrive((inches - getInches(getEncoderAverage())) * drive_kP, 
-                  (lastHeading - imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle) * turn_kP);
+                  (lastHeading - getYaw()) * turn_kP);
     }
   }
   
+  /**
+   * Gets the current gyro yaw angle (so, turning stuff)
+   */
+  public float getYaw() {
+    return imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
+  }
+  
+  /**
+   * Turns to a heading, in place
+   */
+  public void turnToHeading(double heading) {
+    float newHeading = getYaw() + heading; // get the new heading (so that all params passed to this function can be relative)
+    while (!(newHeading - getYaw() <= headingThreshold) || linearOpMode.isStopRequested()) { // until the error is less than our threshold
+      arcadeDrive(0, (newHeading - getYaw()) * turn_kP); // turn in-place
+    }
+  }
 }
