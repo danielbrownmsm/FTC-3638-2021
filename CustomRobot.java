@@ -1,19 +1,39 @@
-public class Robot {
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
+
+public class CustomRobot {
+  /** Motors */
   private DcMotor leftFront;
   private DcMotor rightFront;
   private DcMotor leftBack;
   private DcMotor rightBack;
   
+  /** Servos */
   private Servo armServo;
   private Servo clawServo;
   
+  /** Sensors + control stuff */
   private BNO055IMU.Parameters imuParameters;
+  private BNO055IMU imu1;
   private double drive_kP = 0.05; // need to tune
   private double turn_kP = 0.05; // need to tune
+  private double headingThreshold = 0.1; // tune
+  
+  private double TICKS_PER_REVOLUTION = 1; // change to actual value
+  private double WHEEL_DIAMETER = 4; // change to actual value
   
   private HardwareMap map;
   
-  public RObot() {
+  public CustomRobot() {
   }
   
   /** Idk what this is */
@@ -51,6 +71,7 @@ public class Robot {
     clawServo.setPosition(1);
     
     /** Sensors */
+    imu1 = map.get(BNO055IMU.class, "imu 1");
     imuParameters = new BNO055IMU.Parameters();
     imuParameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
     imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -71,10 +92,10 @@ public class Robot {
    * Resets the encoders of the drivetrain
    */
   public void resetEncoders() {
-    leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODERS);
-    rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODERS);
-    leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODERS);
-    rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODERS);
+    leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     
     leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
@@ -86,17 +107,17 @@ public class Robot {
    * Drive the robot arcade-style
    */
   public void arcadeDrive(double speed, double turn) {
-    leftFront.setPower(drive + turn);
-    leftBack.setPower(drive + turn);
-    rightFront.setPower(drive - turn);
-    rightBack.setPower(drive - turn);
+    leftFront.setPower(speed + turn);
+    leftBack.setPower(speed + turn);
+    rightFront.setPower(speed - turn);
+    rightBack.setPower(speed - turn);
   }
   
   /**
    * Gets the average of all encoders
    */
   public double getEncoderAverage() {
-    return (getLeftEncoderAverage() + getRightEncoderAverage) / 2;
+    return (getLeftEncoderAverage() + getRightEncoderAverage()) / 2;
   }
    
   /**
@@ -126,7 +147,7 @@ public class Robot {
   public void driveDistance(double inches) {
     resetEncoders(); // reset encoders so we start fresh
     float lastHeading = getYaw(); // get the reference angle we will try to P to
-    while (!(Math.abs(getEncoderAverage()) >= inches) || linearOpMode.isStopRequested()) { // idk if this linear op mode thing will work here
+    while (!(Math.abs(getEncoderAverage()) >= inches)) { // idk if this linear op mode thing will work here
       arcadeDrive((inches - getInches(getEncoderAverage())) * drive_kP, 
                   (lastHeading - getYaw()) * turn_kP);
     }
@@ -142,9 +163,9 @@ public class Robot {
   /**
    * Turns to a heading, in place
    */
-  public void turnToHeading(double heading) {
+  public void turnToHeading(float heading) {
     float newHeading = getYaw() + heading; // get the new heading (so that all params passed to this function can be relative)
-    while (!(newHeading - getYaw() <= headingThreshold) || linearOpMode.isStopRequested()) { // until the error is less than our threshold
+    while (!(newHeading - getYaw() <= headingThreshold)) { // until the error is less than our threshold
       arcadeDrive(0, (newHeading - getYaw()) * turn_kP); // turn in-place
     }
   }
