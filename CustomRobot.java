@@ -16,10 +16,12 @@ public class CustomRobot {
   private DcMotor rightFront;
   private DcMotor leftBack;
   private DcMotor rightBack;
+  private DcMotor armMotor;
   
   /** Servos */
   private Servo armServo;
   private Servo clawServo;
+  private Servo ringServo;
   
   /** Sensors + control stuff */
   private BNO055IMU.Parameters imuParameters;
@@ -41,34 +43,40 @@ public class CustomRobot {
     this.map = map_;
     
     /** Create all our motors */
-    leftFront = map.get(DcMotor.class, "left_front");
-    rightFront = map.get(DcMotor.class, "right_front");
-    leftBack = map.get(DcMotor.class, "left_back");
-    rightBack = map.get(DcMotor.class, "right_back");
+    leftFront = map.get(DcMotor.class, "front_left");
+    rightFront = map.get(DcMotor.class, "front_right");
+    leftBack = map.get(DcMotor.class, "back_left");
+    rightBack = map.get(DcMotor.class, "back_right");
+    armMotor = map.get(DcMotor.class, "ring_arm");
     
     /** Set motor directions (ones on right side are reversed */
     leftFront.setDirection(DcMotor.Direction.FORWARD);
     rightFront.setDirection(DcMotor.Direction.REVERSE);
     leftBack.setDirection(DcMotor.Direction.FORWARD);
     rightBack.setDirection(DcMotor.Direction.REVERSE);
+    armMotor.setDirection(DcMotor.Direction.FORWARD);
     
     /** Set all motors to 0 */
     leftFront.setPower(0);
     rightFront.setPower(0);
     leftBack.setPower(0);
     rightBack.setPower(0);
+    armMotor.setPower(0);
     
     /** Set the mode of all the motors */
     leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+    armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     
     /** Now for servos */
     armServo = map.get(Servo.class, "arm");
     clawServo = map.get(Servo.class, "claw");
-    armServo.setPosition(0);
+    ringServo = map.get(Servo.class, "ring_claw");
+    armServo.setPosition(0.5);
     clawServo.setPosition(1);
+    ringServo.setPosition(1);
     
     /** Sensors */
     imu1 = map.get(BNO055IMU.class, "imu 1");
@@ -168,5 +176,59 @@ public class CustomRobot {
     while (!(newHeading - getYaw() <= headingThreshold)) { // until the error is less than our threshold
       arcadeDrive(0, (newHeading - getYaw()) * turn_kP); // turn in-place
     }
+  }
+
+  /**
+   * Drives us in tele-op all mecanum-y
+   * @param leftStickX controls the strafing 
+   * @param leftStickY controls forwards/backwards
+   * @param rightStickX controls the turning
+   */
+  public void driveTeleOp(float leftStickX, float leftStickY, float rightStickX) {
+    leftFront.setPower(leftStickY - leftStickX - rightStickX);
+    rightFront.setPower(leftStickY + leftStickX + rightStickX);
+    leftBack.setPower(leftStickY + leftStickX - rightStickX);
+    rightBack.setPower(leftStickY - leftStickX + rightStickX);
+  }
+
+  /**
+   * Sets the wobble goal claw to either 1 or 0
+   * depending on if you want it open or not
+   * @param open if you want the claw open or not
+   */
+  public void setWobbleClaw(boolean open) {
+    if (open) {
+      clawServo.setPosition(0);
+    } else {
+      clawServo.setPosition(1);
+    }
+  }
+
+  /**
+   * Sets the ring claw to either 0 or 1 depending on open
+   * @param open if you want the claw open or not
+   */
+  public void setRingClaw(boolean open) {
+    if (open) {
+      ringServo.setPosition(0);
+    } else {
+      ringServo.setPosition(1);
+    }
+  }
+
+  /**
+   * Sets the arm servo to the position you give it
+   * @param position the position you want the arm servo to go to
+   */
+  public void setArm(double position) {
+    armServo.setPosition(position);
+  }
+
+  public void setRingArm(double position) {
+    armMotor.setPower(position - ringArmPosition());
+  }
+
+  public float ringArmPosition() {
+    return armMotor.getCurrentPosition();
   }
 }
