@@ -46,7 +46,10 @@ public class AtomicTeleOp extends OpMode
     @Override
     public void loop() {
         // driving
-        robot.driveTeleOp(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+        float tempLeftStickX = Math.copysign(gamepad1.left_stick_x, gamepad1.left_stick_x * gamepad1.left_stick_x);
+        float tempLeftStickY = Math.copysign(gamepad1.left_stick_y, gamepad1.left_stick_y * gamepad1.left_stick_y);
+        float tempRightStickX = Math.copysign(gamepad1.right_stick_x, gamepad1.right_stick_x * gamepad1.right_stick_x);
+        robot.driveTeleOp(tempLeftStickX, tempLeftStickY, tempRightStickX);
 
         // ring arm
         if (gamepad1.right_bumper) {
