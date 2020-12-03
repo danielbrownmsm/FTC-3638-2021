@@ -233,5 +233,9 @@ public class CustomRobot {
   }
   
   public void periodic() {
+    ringArm.setPower((ringArmTarget - ringArmPosition()) * Constants.arm_Kp);
+    
+    telemtry.add("Status", "OK");
+    telemetry.update();
   }
 }
