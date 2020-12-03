@@ -8,7 +8,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import Constants; // do I need the full package declaration?
+import org.firstinspires.ftc.teamcode.Constants; // do I need the full package declaration?
 
 
 public class CustomRobot {
@@ -233,9 +233,6 @@ public class CustomRobot {
   }
   
   public void periodic() {
-    ringArm.setPower((ringArmTarget - ringArmPosition()) * Constants.arm_Kp);
-    
-    telemtry.add("Status", "OK");
-    telemetry.update();
+    ringArm.setPower((ringArmTargetPosition - ringArmPosition()) * Constants.arm_kP);
   }
 }

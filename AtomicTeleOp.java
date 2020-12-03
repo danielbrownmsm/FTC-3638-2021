@@ -46,9 +46,9 @@ public class AtomicTeleOp extends OpMode
     @Override
     public void loop() {
         // driving
-        float tempLeftStickX = Math.copysign(gamepad1.left_stick_x, gamepad1.left_stick_x * gamepad1.left_stick_x);
-        float tempLeftStickY = Math.copysign(gamepad1.left_stick_y, gamepad1.left_stick_y * gamepad1.left_stick_y);
-        float tempRightStickX = Math.copysign(gamepad1.right_stick_x, gamepad1.right_stick_x * gamepad1.right_stick_x);
+        float tempLeftStickX = Math.copySign(gamepad1.left_stick_x * gamepad1.left_stick_x, gamepad1.left_stick_x);
+        float tempLeftStickY = Math.copySign(gamepad1.left_stick_y * gamepad1.left_stick_y, gamepad1.left_stick_y);
+        float tempRightStickX = Math.copySign(gamepad1.right_stick_x * gamepad1.right_stick_x, gamepad1.right_stick_x);
         robot.driveTeleOp(tempLeftStickX, tempLeftStickY, tempRightStickX);
 
         // ring arm
@@ -67,13 +67,13 @@ public class AtomicTeleOp extends OpMode
         
         // wobble goal arm
         if (gamepad1.dpad_up) {
-            robot.setWobbleArm(constants.wobbleServoUp);
+            robot.setWobbleArm(Constants.wobbleServoUp);
         } else if (gamepad1.dpad_left) {
-            robot.setWobbleArm(constants.wobbleServoLeft);
+            robot.setWobbleArm(Constants.wobbleServoLeft);
         } else if (gamepad1.dpad_right) {
-            robot.setWobbleArm(constants.wobbleServoRight);
+            robot.setWobbleArm(Constants.wobbleServoRight);
         } else if (gamepad1.dpad_down) {
-            robot.setWobbleArm(constants.wobbleServoDown);
+            robot.setWobbleArm(Constants.wobbleServoDown);
         }
         
         // wobble goal claw
