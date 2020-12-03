@@ -27,7 +27,7 @@ public class CustomRobot {
   /** Sensors + control stuff */
   private BNO055IMU.Parameters imuParameters;
   private BNO055IMU imu1;
-  private int ringArmTargetPosition = 0; // tune
+  private int ringArmTargetPosition = 10; // tune
   
   private HardwareMap map;
   
@@ -64,6 +64,7 @@ public class CustomRobot {
     rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+    ringArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     ringArm.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     
     /** Now for servos */
@@ -208,8 +209,12 @@ public class CustomRobot {
     if (open) {
       ringClaw.setPosition(0);
     } else {
-      ringClaw.setPosition(1);
+      ringClaw.setPosition(0.2);
     }
+  }
+  
+  public void ringClawKick() {
+    ringClaw.setPosition(1);
   }
 
   /**
@@ -221,8 +226,11 @@ public class CustomRobot {
   }
 
   public void setRingArm(double position) {
-    ringArm.setPower(position - ringArmPosition());
+    //ringArm.setPower(position - ringArmPosition());
+    ringArm.setPower(position);    
   }
+  
+  
 
   public float ringArmPosition() {
     return ringArm.getCurrentPosition();
@@ -230,6 +238,10 @@ public class CustomRobot {
   
   public void incrementRingArm(int val) {
     ringArmTargetPosition += val;
+  }
+  
+  public int getRingArmTarget() {
+    return ringArmTargetPosition;
   }
   
   public void periodic() {

@@ -63,6 +63,8 @@ public class AtomicTeleOp extends OpMode
             robot.setRingClaw(true);
         } else if (gamepad1.x) {
             robot.setRingClaw(false);
+        } else if (gamepad1.back) {
+            robot.ringClawKick();
         }
         
         // wobble goal arm
