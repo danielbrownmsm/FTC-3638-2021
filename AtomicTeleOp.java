@@ -92,7 +92,7 @@ public class AtomicTeleOp extends OpMode
      */
     @Override
     public void stop() {
-        robot.stop();
+        //robot.stop();
     }
 
 }
