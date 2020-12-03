@@ -23,7 +23,6 @@ public class AtomicTeleOp extends OpMode
     @Override
     public void init() {
         robot.init(hardwareMap);
-        telemetry.addData("Status", "Initialized");
     }
 
     /*
@@ -46,7 +45,43 @@ public class AtomicTeleOp extends OpMode
      */
     @Override
     public void loop() {
+        // driving
         robot.driveTeleOp(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+
+        // ring arm
+        if (gamepad1.right_bumper) {
+            robot.incrementRingArm(1);
+        } else if (gamepad1.left_bumper) {
+            robot.incrementRingArm(-1);
+        }
+        
+        // ring claw
+        if (gamepad1.y) {
+            robot.setRingClaw(true);
+        } else if (gamepad1.x) {
+            robot.setRingClaw(false);
+        }
+        
+        // wobble goal arm
+        if (gamepad1.dpad_up) {
+            robot.setWobbleArm(constants.wobbleServoUp);
+        } else if (gamepad1.dpad_left) {
+            robot.setWobbleArm(constants.wobbleServoLeft);
+        } else if (gamepad1.dpad_right) {
+            robot.setWobbleArm(constants.wobbleServoRight);
+        } else if (gamepad1.dpad_down) {
+            robot.setWobbleArm(constants.wobbleServoDown);
+        }
+        
+        // wobble goal claw
+        if (gamepad1.a) {
+            robot.setWobbleClaw(true);
+        } else if (gamepad1.b) {
+            robot.setWobbleClaw(false);
+        }
+        
+        // finally
+        robot.periodic();
     }
 
     /*
@@ -54,6 +89,7 @@ public class AtomicTeleOp extends OpMode
      */
     @Override
     public void stop() {
+        robot.stop();
     }
 
 }
