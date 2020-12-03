@@ -216,7 +216,7 @@ public class CustomRobot {
    * Sets the arm servo to the position you give it
    * @param position the position you want the arm servo to go to
    */
-  public void setArm(double position) {
+  public void setWobbleArm(double position) {
     wobbleArm.setPosition(position);
   }
 
