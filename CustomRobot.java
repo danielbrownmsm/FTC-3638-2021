@@ -8,6 +8,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import Constants; // do I need the full package declaration?
 
 
 public class CustomRobot {
@@ -16,22 +17,17 @@ public class CustomRobot {
   private DcMotor rightFront;
   private DcMotor leftBack;
   private DcMotor rightBack;
-  private DcMotor armMotor;
+  private DcMotor ringArm;
   
   /** Servos */
-  private Servo armServo;
-  private Servo clawServo;
-  private Servo ringServo;
+  private Servo wobbleArm;
+  private Servo wobbleClaw;
+  private Servo ringClaw;
   
   /** Sensors + control stuff */
   private BNO055IMU.Parameters imuParameters;
   private BNO055IMU imu1;
-  private double drive_kP = 0.05; // need to tune
-  private double turn_kP = 0.05; // need to tune
-  private double headingThreshold = 0.1; // tune
-  
-  private double TICKS_PER_REVOLUTION = 1; // change to actual value
-  private double WHEEL_DIAMETER = 4; // change to actual value
+  private int ringArmTargetPosition = 0; // tune
   
   private HardwareMap map;
   
@@ -47,36 +43,36 @@ public class CustomRobot {
     rightFront = map.get(DcMotor.class, "front_right");
     leftBack = map.get(DcMotor.class, "back_left");
     rightBack = map.get(DcMotor.class, "back_right");
-    armMotor = map.get(DcMotor.class, "ring_arm");
+    ringArm = map.get(DcMotor.class, "ring_arm");
     
     /** Set motor directions (ones on right side are reversed */
     leftFront.setDirection(DcMotor.Direction.FORWARD);
     rightFront.setDirection(DcMotor.Direction.REVERSE);
     leftBack.setDirection(DcMotor.Direction.FORWARD);
     rightBack.setDirection(DcMotor.Direction.REVERSE);
-    armMotor.setDirection(DcMotor.Direction.FORWARD);
+    ringArm.setDirection(DcMotor.Direction.FORWARD);
     
     /** Set all motors to 0 */
     leftFront.setPower(0);
     rightFront.setPower(0);
     leftBack.setPower(0);
     rightBack.setPower(0);
-    armMotor.setPower(0);
+    ringArm.setPower(0);
     
     /** Set the mode of all the motors */
     leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-    armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+    ringArm.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     
     /** Now for servos */
-    armServo = map.get(Servo.class, "arm");
-    clawServo = map.get(Servo.class, "claw");
-    ringServo = map.get(Servo.class, "ring_claw");
-    armServo.setPosition(0.5);
-    clawServo.setPosition(1);
-    ringServo.setPosition(1);
+    wobbleArm = map.get(Servo.class, "arm");
+    wobbleClaw = map.get(Servo.class, "claw");
+    ringClaw = map.get(Servo.class, "ring_claw");
+    wobbleArm.setPosition(0.5);
+    wobbleClaw.setPosition(1);
+    ringClaw.setPosition(1);
     
     /** Sensors */
     imu1 = map.get(BNO055IMU.class, "imu 1");
@@ -146,7 +142,7 @@ public class CustomRobot {
    * Given a tick count, returns that distance in inches
    */
   public double getInches(double ticks) {
-    return ticks / TICKS_PER_REVOLUTION * WHEEL_DIAMETER * Math.PI;
+    return ticks / Constants.TICKS_PER_REVOLUTION * Constants.WHEEL_DIAMETER * Math.PI;
   }
 
   /**
@@ -156,8 +152,8 @@ public class CustomRobot {
     resetEncoders(); // reset encoders so we start fresh
     float lastHeading = getYaw(); // get the reference angle we will try to P to
     while (!(Math.abs(getEncoderAverage()) >= inches)) { // idk if this linear op mode thing will work here
-      arcadeDrive((inches - getInches(getEncoderAverage())) * drive_kP, 
-                  (lastHeading - getYaw()) * turn_kP);
+      arcadeDrive((inches - getInches(getEncoderAverage())) * Constants.drive_kP, 
+                  (lastHeading - getYaw()) * Constants.turn_kP);
     }
   }
   
@@ -173,8 +169,8 @@ public class CustomRobot {
    */
   public void turnToHeading(float heading) {
     float newHeading = getYaw() + heading; // get the new heading (so that all params passed to this function can be relative)
-    while (!(newHeading - getYaw() <= headingThreshold)) { // until the error is less than our threshold
-      arcadeDrive(0, (newHeading - getYaw()) * turn_kP); // turn in-place
+    while (!(newHeading - getYaw() <= Constants.headingThreshold)) { // until the error is less than our threshold
+      arcadeDrive(0, (newHeading - getYaw()) * Constants.turn_kP); // turn in-place
     }
   }
 
@@ -198,9 +194,9 @@ public class CustomRobot {
    */
   public void setWobbleClaw(boolean open) {
     if (open) {
-      clawServo.setPosition(0);
+      wobbleClaw.setPosition(0);
     } else {
-      clawServo.setPosition(1);
+      wobbleClaw.setPosition(1);
     }
   }
 
@@ -210,9 +206,9 @@ public class CustomRobot {
    */
   public void setRingClaw(boolean open) {
     if (open) {
-      ringServo.setPosition(0);
+      ringClaw.setPosition(0);
     } else {
-      ringServo.setPosition(1);
+      ringClaw.setPosition(1);
     }
   }
 
@@ -221,14 +217,21 @@ public class CustomRobot {
    * @param position the position you want the arm servo to go to
    */
   public void setArm(double position) {
-    armServo.setPosition(position);
+    wobbleArm.setPosition(position);
   }
 
   public void setRingArm(double position) {
-    armMotor.setPower(position - ringArmPosition());
+    ringArm.setPower(position - ringArmPosition());
   }
 
   public float ringArmPosition() {
-    return armMotor.getCurrentPosition();
+    return ringArm.getCurrentPosition();
+  }
+  
+  public void incrementRingArm(int val) {
+    ringArmTargetPosition += val;
+  }
+  
+  public void periodic() {
   }
 }
