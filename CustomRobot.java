@@ -149,12 +149,14 @@ public class CustomRobot {
   /**
    * Drives the robot on the last taken heading (so, straight) the distance given in inches
    */
-  public void driveDistance(double inches) {
-    resetEncoders(); // reset encoders so we start fresh
+  public boolean driveDistance(double inches) {
     float lastHeading = getYaw(); // get the reference angle we will try to P to
-    while (!(Math.abs(getEncoderAverage()) >= inches)) { // idk if this linear op mode thing will work here
+    if (Math.abs(getInches(getEncoderAverage())) <= inches) { // idk if this linear op mode thing will work here
       arcadeDrive((inches - getInches(getEncoderAverage())) * Constants.drive_kP, 
                   (lastHeading - getYaw()) * Constants.turn_kP);
+      return false;
+    } else {
+      return true;
     }
   }
   
@@ -230,7 +232,9 @@ public class CustomRobot {
     ringArm.setPower(position);    
   }
   
-  
+  public void setRingArmTarget(int target) {
+    ringArmTargetPosition = target;
+  }
 
   public float ringArmPosition() {
     return ringArm.getCurrentPosition();
@@ -246,5 +250,12 @@ public class CustomRobot {
   
   public void periodic() {
     ringArm.setPower((ringArmTargetPosition - ringArmPosition()) * Constants.arm_kP);
+  }
+  
+  public void setMotorZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior) {
+    leftFront.setZeroPowerBehavior(behavior);
+    rightFront.setZeroPowerBehavior(behavior);
+    leftBack.setZeroPowerBehavior(behavior);
+    rightBack.setZeroPowerBehavior(behavior);
   }
 }
