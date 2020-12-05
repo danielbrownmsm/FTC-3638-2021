@@ -1,16 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.Constants; // do I need the full package declaration?
+import org.firstinspires.ftc.teamcode.Constants;
 
-
+/** A class to represent our robot */
 public class CustomRobot {
   /** Motors */
   private DcMotor leftFront;
@@ -27,14 +26,17 @@ public class CustomRobot {
   /** Sensors + control stuff */
   private BNO055IMU.Parameters imuParameters;
   private BNO055IMU imu1;
-  private int ringArmTargetPosition = 10; // tune
+  private int ringArmTargetPosition = 10;
   
   private HardwareMap map;
   
   public CustomRobot() {
   }
   
-  /** Idk what this is */
+  /**
+   * Initializes the robot with the given hardware map
+   * @param map_ the HardwareMap for the op-mode so we can instantiate our sensors and actuators
+   */
   public void init(HardwareMap map_) {
     this.map = map_;
     
@@ -71,7 +73,7 @@ public class CustomRobot {
     wobbleArm = map.get(Servo.class, "arm");
     wobbleClaw = map.get(Servo.class, "claw");
     ringClaw = map.get(Servo.class, "ring_claw");
-    //wobbleArm.setPosition(0.5);
+    
     wobbleClaw.setPosition(1);
     ringClaw.setPosition(1);
     
@@ -88,6 +90,7 @@ public class CustomRobot {
   
   /**
    * Gets if the imu is calibrated and ready-to-use or not
+   * @return whether the IMU is calibrated or not
    */
   public Boolean isGyroCalibrated() {
     return imu1.isSystemCalibrated();
@@ -110,6 +113,8 @@ public class CustomRobot {
   
   /**
    * Drive the robot arcade-style
+   * @param speed the power you want to drive forwards/reverse at
+   * @param turn the amount of turn you want to have
    */
   public void arcadeDrive(double speed, double turn) {
     leftFront.setPower(speed + turn);
@@ -120,6 +125,7 @@ public class CustomRobot {
   
   /**
    * Gets the average of all encoders
+   * @return the average of the left and right encoders on the drivetrain
    */
   public double getEncoderAverage() {
     return (getLeftEncoderAverage() + getRightEncoderAverage()) / 2;
@@ -127,6 +133,7 @@ public class CustomRobot {
    
   /**
    * Gets the average of the left encoders
+   * @return the average of the encoders on the left side of the drivetrain
    */
   public double getLeftEncoderAverage() {
     return (leftFront.getCurrentPosition() + leftBack.getCurrentPosition()) / 2;
@@ -134,6 +141,7 @@ public class CustomRobot {
 
   /**
    * Gets the average of the right encoders
+   * @return the average of the encoders on the right side of the drivetrain
    */
   public double getRightEncoderAverage() {
     return (rightFront.getCurrentPosition() + rightBack.getCurrentPosition()) / 2;
@@ -141,39 +149,53 @@ public class CustomRobot {
   
   /**
    * Given a tick count, returns that distance in inches
+   * @param ticks the number of ticks of the encoder
+   * @return the distance that that number represents, in inches
    */
   public double getInches(double ticks) {
     return ticks / Constants.TICKS_PER_REVOLUTION * Constants.WHEEL_DIAMETER * Math.PI;
   }
 
   /**
+   * Sets the last taken heading so we can drive straight in driveDistance
+   */
+  public void setHeading() {
+    lastHeading = getYaw();
+  }
+
+  /**
    * Drives the robot on the last taken heading (so, straight) the distance given in inches
+   * @param inches how far you want to drive, in inches
+   * @return if we have reached that distance or not
    */
   public boolean driveDistance(double inches) {
-    float lastHeading = getYaw(); // get the reference angle we will try to P to
-    if (Math.abs(getInches(getEncoderAverage())) <= inches) { // idk if this linear op mode thing will work here
+    if (Math.abs(getInches(getEncoderAverage())) <= inches) { // if we haven't reached where we need to go
       arcadeDrive((inches - getInches(getEncoderAverage())) * Constants.drive_kP, 
-                  (lastHeading - getYaw()) * Constants.turn_kP);
-      return false;
+                  (lastHeading - getYaw()) * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
+      return false; // we haven't reached it yet
     } else {
-      return true;
+      return true; // we're here!
     }
   }
   
   /**
    * Gets the current gyro yaw angle (so, turning stuff)
+   * @return the yaw of the gyro
    */
   public float getYaw() {
     return imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
   }
   
   /**
-   * Turns to a heading, in place
+   * Turns to a heading, in place. Make sure to call setHeading() before this
+   * @param heading the heading you want to turn to, relative to the robot
    */
-  public void turnToHeading(float heading) {
-    float newHeading = getYaw() + heading; // get the new heading (so that all params passed to this function can be relative)
-    while (!(newHeading - getYaw() <= Constants.headingThreshold)) { // until the error is less than our threshold
-      arcadeDrive(0, (newHeading - getYaw()) * Constants.turn_kP); // turn in-place
+  public boolean turnToHeading(float heading) {
+    if (lastHeading + heading - getYaw() >= Constants.headingThreshold)) { // if the error is less than our threshold
+      arcadeDrive(0, (newHeading - getYaw()) * Constants.turn_kP); // turn in-place, proportionally
+      return false;
+    } else {
+      return true; // we have reached that heading
     }
   }
 
@@ -215,6 +237,9 @@ public class CustomRobot {
     }
   }
   
+  /**
+   * "Kicks" the ring claw outwards to knock any rings off of our pointy part
+   */
   public void ringClawKick() {
     ringClaw.setPosition(1);
   }
@@ -226,32 +251,36 @@ public class CustomRobot {
   public void setWobbleArm(double position) {
     wobbleArm.setPosition(position);
   }
-
-  public void setRingArm(double position) {
-    //ringArm.setPower(position - ringArmPosition());
-    ringArm.setPower(position);    
-  }
   
+  /**
+   * Sets the ring arm target it should P to
+   * @param target the count of encoder ticks the ring arm should try to stay at
+   */
   public void setRingArmTarget(int target) {
     ringArmTargetPosition = target;
   }
-
-  public float ringArmPosition() {
-    return ringArm.getCurrentPosition();
-  }
   
+  /**
+   * Increments the ring arm target by the given value
+   * @param val the number of ticks (can be negative) you want to increment the ring arm target by
+   */
   public void incrementRingArm(int val) {
     ringArmTargetPosition += val;
   }
   
-  public int getRingArmTarget() {
-    return ringArmTargetPosition;
-  }
-  
+  /**
+   * Should be called once every loop (or, in the case of auto, very often)
+   * Does things like telemetry (although not right now) and other stuff we want to run often,
+   * like making sure the arm stays where it's supposed to
+   */
   public void periodic() {
-    ringArm.setPower((ringArmTargetPosition - ringArmPosition()) * Constants.arm_kP);
+    ringArm.setPower((ringArmTargetPosition - ringArm.getCurrentPosition()) * Constants.arm_kP);
   }
   
+  /**
+   * Sets the zero power behavior (either BRAKE or FLOAT) of the drivetrain motors
+   * @param behavior a DcMotor.ZeroPowerBehavior
+   */
   public void setMotorZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior) {
     leftFront.setZeroPowerBehavior(behavior);
     rightFront.setZeroPowerBehavior(behavior);

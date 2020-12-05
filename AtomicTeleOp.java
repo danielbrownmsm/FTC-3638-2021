@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.CustomRobot;
 
 @TeleOp(name="TeleOp", group="Iterative Opmode")
@@ -38,6 +37,8 @@ public class AtomicTeleOp extends OpMode
     @Override
     public void start() {
         runtime.reset();
+        robot.setRingClaw(true);
+        robot.setWobbleArm(Constants.wobbleServoUp);
     }
 
     /*

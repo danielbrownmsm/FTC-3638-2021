@@ -1,23 +1,8 @@
 package org.firstinspires.ftc.teamcode;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import org.firstinspires.ftc.robotcore.external.Const;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.robotcore.external.JavaUtil;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.TempUnit;
 
 @Autonomous(name = "DriveToLineAuto", group = "")
 public class DriveToLineAutoBetter extends LinearOpMode {
@@ -28,14 +13,16 @@ public class DriveToLineAutoBetter extends LinearOpMode {
    */
   @Override
   public void runOpMode()  {
-    robot.init(hardwareMap);
-    robot.setRingArmTarget(30);
+    robot.init(hardwareMap); // init our robot
+    robot.setRingArmTarget(30); // get the arm ready to raise itself so it doesn't get in the way
     waitForStart();
     
-    robot.resetEncoders();
-    robot.setMotorZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    while(!robot.driveDistance(82 - Constants.driftDistance)) {
-      robot.periodic();
+    robot.resetEncoders(); // prepare ourselves
+    robot.setHeading(); // to drive
+    robot.setMotorZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); // so we don't drift after we stop
+    while(!robot.driveDistance(82 - Constants.driftDistance)) { // this part up here drives
+      robot.periodic(); // this part here makes this loop last the entire time without the opmode freakin stopping immediately
+      // because I guess functions are non-blocking. Also makes sure the arm doesn't go kaboom
     }
     robot.driveTeleOp(0, 0, 0);
   }
