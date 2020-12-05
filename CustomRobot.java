@@ -67,6 +67,7 @@ public class CustomRobot {
     rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+    
     ringArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     ringArm.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     
