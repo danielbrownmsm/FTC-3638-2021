@@ -27,6 +27,7 @@ public class CustomRobot {
   private BNO055IMU.Parameters imuParameters;
   private BNO055IMU imu1;
   public int ringArmTargetPosition = 10;
+  private float lastHeading = 0;
   
   private HardwareMap map;
   
@@ -183,16 +184,14 @@ public class CustomRobot {
    * @param inches how far you want to strafe, in inches
    * @return if we've reached the distance or not
    */
-  public void strafeDistance(double inches) {
-    public boolean driveDistance(double inches) {
+  public boolean strafeDistance(double inches) {
     if (Math.abs(getInches(getEncoderAverage())) <= inches) { // if we haven't reached where we need to go
-      driveTeleOp(0, (inches - getInches(getEncoderAverage())) * Constants.drive_kP, 
-                  (lastHeading - getYaw()) * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
+      driveTeleOp(0, (float) ((inches - getInches(getEncoderAverage())) * Constants.drive_kP), 
+                  (float) ((lastHeading - getYaw()) * Constants.turn_kP)); // drive there proportionally to how far away we are, and straight
       return false; // we haven't reached it yet
     } else {
       return true; // we're here!
     }
-  }
   }
   
   /**
@@ -208,8 +207,8 @@ public class CustomRobot {
    * @param heading the heading you want to turn to, relative to the robot
    */
   public boolean turnToHeading(float heading) {
-    if (lastHeading + heading - getYaw() >= Constants.headingThreshold)) { // if the error is less than our threshold
-      arcadeDrive(0, (newHeading - getYaw()) * Constants.turn_kP); // turn in-place, proportionally
+    if (lastHeading + heading - getYaw() >= Constants.headingThreshold) { // if the error is less than our threshold
+      arcadeDrive(0, (lastHeading + heading - getYaw()) * Constants.turn_kP); // turn in-place, proportionally
       return false;
     } else {
       return true; // we have reached that heading

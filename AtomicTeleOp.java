@@ -69,33 +69,33 @@ public class AtomicTeleOp extends OpMode
         lastTime = runtime.nanoseconds();
         
         // ring claw
-        if (gamepad1.y || gamepd2.y) {
+        if (gamepad1.y || gamepad2.y) {
             robot.setRingClaw(true);
-        } else if (gamepad1.x || gamepd2.x) {
+        } else if (gamepad1.x || gamepad2.x) {
             robot.setRingClaw(false);
-        } else if (gamepad1.back || gamepd2.back) {
+        } else if (gamepad1.back || gamepad2.back) {
             robot.ringClawKick();
         }
         telemetry.addData("Ring Claw ns: ", lastTime - runtime.nanoseconds());
         lastTime = runtime.nanoseconds();
         
         // wobble goal arm
-        if (gamepad1.dpad_up || gamepd2.dpad_up) {
+        if (gamepad1.dpad_up || gamepad2.dpad_up) {
             robot.setWobbleArm(Constants.wobbleServoUp);
-        } else if (gamepad1.dpad_left || gamepd2.dpad_left) {
+        } else if (gamepad1.dpad_left || gamepad2.dpad_left) {
             robot.setWobbleArm(Constants.wobbleServoLeft);
-        } else if (gamepad1.dpad_right || gamepd2.dpad_right) {
+        } else if (gamepad1.dpad_right || gamepad2.dpad_right) {
             robot.setWobbleArm(Constants.wobbleServoRight);
-        } else if (gamepad1.dpad_down || gamepd2.dpad_down) {
+        } else if (gamepad1.dpad_down || gamepad2.dpad_down) {
             robot.setWobbleArm(Constants.wobbleServoDown);
         }
         telemetry.addData("Wobble Arm ns: ", lastTime - runtime.nanoseconds());
         lastTime = runtime.nanoseconds();
         
         // wobble goal claw
-        if (gamepad1.a || gamepd2.a) {
+        if (gamepad1.a || gamepad2.a) {
             robot.setWobbleClaw(true);
-        } else if (gamepad1.b || gamepd2.b) {
+        } else if (gamepad1.b || gamepad2.b) {
             robot.setWobbleClaw(false);
         }
         telemetry.addData("Wobble Claw ns: ", lastTime - runtime.nanoseconds());
