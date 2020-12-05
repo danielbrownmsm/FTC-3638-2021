@@ -71,7 +71,7 @@ public class CustomRobot {
     wobbleArm = map.get(Servo.class, "arm");
     wobbleClaw = map.get(Servo.class, "claw");
     ringClaw = map.get(Servo.class, "ring_claw");
-    wobbleArm.setPosition(0.5);
+    //wobbleArm.setPosition(0.5);
     wobbleClaw.setPosition(1);
     ringClaw.setPosition(1);
     
