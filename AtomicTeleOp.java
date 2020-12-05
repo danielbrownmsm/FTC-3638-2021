@@ -13,7 +13,8 @@ import org.firstinspires.ftc.teamcode.CustomRobot;
 public class AtomicTeleOp extends OpMode
 {
     // Declare OpMode members.
-    private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    private long lastTime = 0;
     private CustomRobot robot = new CustomRobot();
 
     /*
@@ -39,6 +40,7 @@ public class AtomicTeleOp extends OpMode
         runtime.reset();
         robot.setRingClaw(true);
         robot.setWobbleArm(Constants.wobbleServoUp);
+        robot.incrementRingArm(30);
     }
 
     /*
@@ -46,48 +48,65 @@ public class AtomicTeleOp extends OpMode
      */
     @Override
     public void loop() {
-        // driving
+        lastTime = runtime.nanoseconds();
+        // driving (square inputs)
         float tempLeftStickX = Math.copySign(gamepad1.left_stick_x * gamepad1.left_stick_x, gamepad1.left_stick_x);
         float tempLeftStickY = Math.copySign(gamepad1.left_stick_y * gamepad1.left_stick_y, gamepad1.left_stick_y);
         float tempRightStickX = Math.copySign(gamepad1.right_stick_x * gamepad1.right_stick_x, gamepad1.right_stick_x);
         robot.driveTeleOp(tempLeftStickX, tempLeftStickY, tempRightStickX);
+        
+        telemetry.addData("Driving ns: ", lastTime - runtime.nanoseconds());
+        lastTime = runtime.nanoseconds();
 
         // ring arm
-        if (gamepad1.right_bumper) {
+        if (gamepad1.right_bumper || gamepad2.right_bumper) {
             robot.incrementRingArm(1);
-        } else if (gamepad1.left_bumper) {
+        } else if (gamepad1.left_bumper || gamepad2.left_bumper) {
             robot.incrementRingArm(-1);
         }
+        telemetry.addData("Arm Target: ", robot.ringArmTargetPosition); //yes, I made a public variable. Deal with it.
+        telemetry.addData("Ring Arm ns: ", lastTime - runtime.nanoseconds());
+        lastTime = runtime.nanoseconds();
         
         // ring claw
-        if (gamepad1.y) {
+        if (gamepad1.y || gamepd2.y) {
             robot.setRingClaw(true);
-        } else if (gamepad1.x) {
+        } else if (gamepad1.x || gamepd2.x) {
             robot.setRingClaw(false);
-        } else if (gamepad1.back) {
+        } else if (gamepad1.back || gamepd2.back) {
             robot.ringClawKick();
         }
+        telemetry.addData("Ring Claw ns: ", lastTime - runtime.nanoseconds());
+        lastTime = runtime.nanoseconds();
         
         // wobble goal arm
-        if (gamepad1.dpad_up) {
+        if (gamepad1.dpad_up || gamepd2.dpad_up) {
             robot.setWobbleArm(Constants.wobbleServoUp);
-        } else if (gamepad1.dpad_left) {
+        } else if (gamepad1.dpad_left || gamepd2.dpad_left) {
             robot.setWobbleArm(Constants.wobbleServoLeft);
-        } else if (gamepad1.dpad_right) {
+        } else if (gamepad1.dpad_right || gamepd2.dpad_right) {
             robot.setWobbleArm(Constants.wobbleServoRight);
-        } else if (gamepad1.dpad_down) {
+        } else if (gamepad1.dpad_down || gamepd2.dpad_down) {
             robot.setWobbleArm(Constants.wobbleServoDown);
         }
+        telemetry.addData("Wobble Arm ns: ", lastTime - runtime.nanoseconds());
+        lastTime = runtime.nanoseconds();
         
         // wobble goal claw
-        if (gamepad1.a) {
+        if (gamepad1.a || gamepd2.a) {
             robot.setWobbleClaw(true);
-        } else if (gamepad1.b) {
+        } else if (gamepad1.b || gamepd2.b) {
             robot.setWobbleClaw(false);
         }
+        telemetry.addData("Wobble Claw ns: ", lastTime - runtime.nanoseconds());
+        lastTime = runtime.nanoseconds();
         
         // finally
         robot.periodic();
+
+        telemetry.addData("Periodic ns: ", lastTime - runtime.nanoseconds());
+        lastTime = runtime.nanoseconds();
+        telemetry.update();
     }
 
     /*

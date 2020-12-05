@@ -26,7 +26,7 @@ public class CustomRobot {
   /** Sensors + control stuff */
   private BNO055IMU.Parameters imuParameters;
   private BNO055IMU imu1;
-  private int ringArmTargetPosition = 10;
+  public int ringArmTargetPosition = 10;
   
   private HardwareMap map;
   
@@ -176,6 +176,23 @@ public class CustomRobot {
     } else {
       return true; // we're here!
     }
+  }
+
+  /**
+   * Strafes us a distance left/right, trying (hopefully) to keep us straight
+   * @param inches how far you want to strafe, in inches
+   * @return if we've reached the distance or not
+   */
+  public void strafeDistance(double inches) {
+    public boolean driveDistance(double inches) {
+    if (Math.abs(getInches(getEncoderAverage())) <= inches) { // if we haven't reached where we need to go
+      driveTeleOp(0, (inches - getInches(getEncoderAverage())) * Constants.drive_kP, 
+                  (lastHeading - getYaw()) * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
+      return false; // we haven't reached it yet
+    } else {
+      return true; // we're here!
+    }
+  }
   }
   
   /**
