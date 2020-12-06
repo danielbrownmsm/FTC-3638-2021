@@ -89,6 +89,49 @@ public class CustomRobot {
     imuParameters.accelerationIntegrationAlgorithm = null;
     imu1.initialize(imuParameters); // initialize the imu
   }
+
+  /**
+   * Runs some tests to make sure our robot is working correctly.
+   * Crashes the code otherwise
+   */
+  public void testRobot() {
+    // make sure everything exists
+    assert leftFront != null;
+    assert rightFront != null;
+    assert leftBack != null;
+    assert rightBack != null;
+    assert wobbleArm != null;
+    assert wobbleClaw != null;
+    assert ringArm != null;
+    assert ringClaw != null;
+    assert imu1 != null;
+
+    // make sure all the motors are using encoders
+    assert leftFront.getMode() == DcMotor.RunMode.RUN_USING_ENCODERS;
+    assert leftBack.getMode() == DcMotor.RunMode.RUN_USING_ENCODERS;
+    assert rightFront.getMode() == DcMotor.RunMode.RUN_USING_ENCODERS;
+    assert rightBack.getMode() == DcMotor.RunMode.RUN_USING_ENCODERS;
+    assert ringArm.getMode() == DcMotor.RunMode.RUN_USING_ENCODERS;
+
+    assert leftFront.getDirection() == DcMotorSimple.Direction.FORWARD;
+    assert rightFront.getDirection() == DcMotorSimple.Direction.REVERSE;
+    assert leftBack.getDirection() == DcMotorSimple.Direction.FORWARD;
+    assert rightBack.getDirection() == DcMotorSimple.Direction.REVERSE;
+    assert ringArm.getDirection() == DcMotorSimple.Direction.FORWARD;
+    
+    // this method should be run directly after init() so the servos shouldn't have moved at all
+    assert wobbleClaw.getPosition() == 1;
+    assert ringClaw.getPOsition() == 1;
+
+    // again, shouldn't have changed
+    assert ringArmTargetPosition == 10;
+    incrementRingArm(10);
+    assert ringArmTargetPosition == 20;
+
+    // we should be getting _something_
+    assert getEncoderAverage() != null;
+    assert getYaw() != null;
+  }
   
   /**
    * Gets if the imu is calibrated and ready-to-use or not
@@ -171,7 +214,7 @@ public class CustomRobot {
    * @return if we have reached that distance or not
    */
   public boolean driveDistance(double inches) {
-    if (Math.abs(getInches(getEncoderAverage())) <= inches) { // if we haven't reached where we need to go
+    if (Math.abs(getInches(getEncoderAverage())) < inches) { // if we haven't reached where we need to go
       arcadeDrive((inches - getInches(getEncoderAverage())) * -Constants.drive_kP, 
                   (lastHeading - getYaw()) * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
       return false; // we haven't reached it yet
@@ -186,7 +229,7 @@ public class CustomRobot {
    * @return if we've reached the distance or not
    */
   public boolean strafeDistance(double inches) {
-    if (Math.abs(getInches(getEncoderAverage())) <= inches) { // if we haven't reached where we need to go
+    if (Math.abs(getInches(getEncoderAverage())) < inches) { // if we haven't reached where we need to go
       driveTeleOp(0, (float) ((inches - getInches(getEncoderAverage())) * Constants.drive_kP), 
                   (float) ((lastHeading - getYaw()) * Constants.turn_kP)); // drive there proportionally to how far away we are, and straight
       return false; // we haven't reached it yet
@@ -208,7 +251,7 @@ public class CustomRobot {
    * @param heading the heading you want to turn to, relative to the robot
    */
   public boolean turnToHeading(float heading) {
-    if (lastHeading + heading - getYaw() >= Constants.headingThreshold) { // if the error is less than our threshold
+    if (lastHeading + heading - getYaw() > Constants.headingThreshold) { // if the error is less than our threshold
       arcadeDrive(0, (lastHeading + heading - getYaw()) * Constants.turn_kP); // turn in-place, proportionally
       return false;
     } else {
