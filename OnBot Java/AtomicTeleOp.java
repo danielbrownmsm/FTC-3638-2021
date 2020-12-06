@@ -46,47 +46,50 @@ public class AtomicTeleOp extends OpMode
      */
     @Override
     public void loop() {
-        // driving (square inputs)
-        float tempLeftStickX = Math.copySign(gamepad1.left_stick_x * gamepad1.left_stick_x, gamepad1.left_stick_x);
-        float tempLeftStickY = Math.copySign(gamepad1.left_stick_y * gamepad1.left_stick_y, gamepad1.left_stick_y);
-        float tempRightStickX = Math.copySign(gamepad1.right_stick_x * gamepad1.right_stick_x, gamepad1.right_stick_x);
-        robot.driveTeleOp(tempLeftStickX, tempLeftStickY, tempRightStickX);
+        try {
+            // driving (square inputs)
+            float tempLeftStickX = Math.copySign(gamepad1.left_stick_x * gamepad1.left_stick_x, gamepad1.left_stick_x);
+            float tempLeftStickY = Math.copySign(gamepad1.left_stick_y * gamepad1.left_stick_y, gamepad1.left_stick_y);
+            float tempRightStickX = Math.copySign(gamepad1.right_stick_x * gamepad1.right_stick_x, gamepad1.right_stick_x);
+            robot.driveTeleOp(tempLeftStickX, tempLeftStickY, tempRightStickX);
 
-        // ring arm
-        if (gamepad2.right_bumper) {
-            robot.incrementRingArm(1);
-        } else if (gamepad2.left_bumper) {
-            robot.incrementRingArm(-1);
+            // ring arm
+            if (gamepad2.right_bumper) {
+                robot.incrementRingArm(1);
+            } else if (gamepad2.left_bumper) {
+                robot.incrementRingArm(-1);
+            }
+
+            // ring claw
+            if (gamepad2.y) {
+                robot.setRingClaw(true);
+            } else if (gamepad2.x) {
+                robot.setRingClaw(false);
+            } else if (gamepad2.back) {
+                robot.ringClawKick();
+            }
+
+            // wobble goal arm
+            if (gamepad2.dpad_up) {
+                robot.setWobbleArm(Constants.wobbleServoUp);
+            } else if (gamepad2.dpad_left) {
+                robot.setWobbleArm(Constants.wobbleServoLeft);
+            } else if (gamepad2.dpad_right) {
+                robot.setWobbleArm(Constants.wobbleServoRight);
+            }
+
+            // wobble goal claw
+            if (gamepad2.a) {
+                robot.setWobbleClaw(true);
+            } else if (gamepad2.b) {
+                robot.setWobbleClaw(false);
+            }
+
+            // finally
+            robot.periodic();
+        } catch (TargetPositionNotSetException targetPosError) {
+            telemetry.addData("The target position error happened again", "");
         }
-
-        // ring claw
-        if (gamepad2.y) {
-            robot.setRingClaw(true);
-        } else if (gamepad2.x) {
-            robot.setRingClaw(false);
-        } else if (gamepad2.back) {
-            robot.ringClawKick();
-        }
-
-        // wobble goal arm
-        if (gamepad2.dpad_up) {
-            robot.setWobbleArm(Constants.wobbleServoUp);
-        } else if (gamepad2.dpad_left) {
-            robot.setWobbleArm(Constants.wobbleServoLeft);
-        } else if (gamepad2.dpad_right) {
-            robot.setWobbleArm(Constants.wobbleServoRight);
-        }
-
-        // wobble goal claw
-        if (gamepad2.a) {
-            robot.setWobbleClaw(true);
-        } else if (gamepad2.b) {
-            robot.setWobbleClaw(false);
-        }
-
-        // finally
-        robot.periodic();
-
     }
 
     /*
