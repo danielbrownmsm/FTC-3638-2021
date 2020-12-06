@@ -172,7 +172,7 @@ public class CustomRobot {
    */
   public boolean driveDistance(double inches) {
     if (Math.abs(getInches(getEncoderAverage())) <= inches) { // if we haven't reached where we need to go
-      arcadeDrive((inches - getInches(getEncoderAverage())) * Constants.drive_kP, 
+      arcadeDrive((inches - getInches(getEncoderAverage())) * -Constants.drive_kP, 
                   (lastHeading - getYaw()) * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
       return false; // we haven't reached it yet
     } else {

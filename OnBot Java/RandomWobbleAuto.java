@@ -40,6 +40,7 @@ public class RandomWobbleAuto extends LinearOpMode {
     while(!robot.driveDistance(-60 + Constants.driftDistance)) { // does the actual driving
       robot.periodic(); // makes driving work and arm not blow up
     }
+    sleep(10); //?
     robot.driveTeleOp(0, 0, 0); // hard-stop
     sleep(1000); // just to be safe
   }
