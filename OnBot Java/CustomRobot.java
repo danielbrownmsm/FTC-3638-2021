@@ -16,17 +16,14 @@ public class CustomRobot {
   private DcMotor rightFront;
   private DcMotor leftBack;
   private DcMotor rightBack;
-  private DcMotor ringArm;
   
   /** Servos */
   private Servo wobbleArm;
   private Servo wobbleClaw;
-  private Servo ringClaw;
   
   /** Sensors + control stuff */
   private BNO055IMU.Parameters imuParameters;
   private BNO055IMU imu1;
-  public int ringArmTargetPosition = 10;
   private float lastHeading = 0;
   
   private HardwareMap map;
@@ -46,38 +43,30 @@ public class CustomRobot {
     rightFront = map.get(DcMotor.class, "front_right");
     leftBack = map.get(DcMotor.class, "back_left");
     rightBack = map.get(DcMotor.class, "back_right");
-    ringArm = map.get(DcMotor.class, "ring_arm");
     
     /** Set motor directions (ones on right side are reversed */
     leftFront.setDirection(DcMotor.Direction.FORWARD);
     rightFront.setDirection(DcMotor.Direction.REVERSE);
     leftBack.setDirection(DcMotor.Direction.FORWARD);
     rightBack.setDirection(DcMotor.Direction.REVERSE);
-    ringArm.setDirection(DcMotor.Direction.FORWARD);
     
     /** Set all motors to 0 */
     leftFront.setPower(0);
     rightFront.setPower(0);
     leftBack.setPower(0);
     rightBack.setPower(0);
-    ringArm.setPower(0);
     
     /** Set the mode of all the motors */
     leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-    
-    ringArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    ringArm.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-    
+        
     /** Now for servos */
-    wobbleArm = map.get(Servo.class, "arm");
-    wobbleClaw = map.get(Servo.class, "claw");
-    ringClaw = map.get(Servo.class, "ring_claw");
+    wobbleArm = map.get(Servo.class, "wobble_arm");
+    wobbleClaw = map.get(Servo.class, "wobble_claw");
     
     wobbleClaw.setPosition(1);
-    ringClaw.setPosition(1);
     
     /** Sensors */
     imu1 = map.get(BNO055IMU.class, "imu 1");
@@ -102,8 +91,6 @@ public class CustomRobot {
     assert rightBack != null;
     assert wobbleArm != null;
     assert wobbleClaw != null;
-    assert ringArm != null;
-    assert ringClaw != null;
     assert imu1 != null;
 
     // make sure all the motors are using encoders
@@ -111,26 +98,19 @@ public class CustomRobot {
     assert leftBack.getMode() == DcMotor.RunMode.RUN_USING_ENCODERS;
     assert rightFront.getMode() == DcMotor.RunMode.RUN_USING_ENCODERS;
     assert rightBack.getMode() == DcMotor.RunMode.RUN_USING_ENCODERS;
-    assert ringArm.getMode() == DcMotor.RunMode.RUN_USING_ENCODERS;
-
+    
     assert leftFront.getDirection() == DcMotorSimple.Direction.FORWARD;
     assert rightFront.getDirection() == DcMotorSimple.Direction.REVERSE;
     assert leftBack.getDirection() == DcMotorSimple.Direction.FORWARD;
     assert rightBack.getDirection() == DcMotorSimple.Direction.REVERSE;
-    assert ringArm.getDirection() == DcMotorSimple.Direction.FORWARD;
     
     // this method should be run directly after init() so the servos shouldn't have moved at all
     assert wobbleClaw.getPosition() == 1;
-    assert ringClaw.getPOsition() == 1;
-
-    // again, shouldn't have changed
-    assert ringArmTargetPosition == 10;
-    incrementRingArm(10);
-    assert ringArmTargetPosition == 20;
-
+    
     // we should be getting _something_
-    assert getEncoderAverage() != null;
-    assert getYaw() != null;
+    // can't compare the return type with null?
+    //assert getEncoderAverage() != null;
+    //assert getYaw() != null;
   }
   
   /**
@@ -286,56 +266,13 @@ public class CustomRobot {
   }
 
   /**
-   * Sets the ring claw to either 0 or 1 depending on open
-   * @param open if you want the claw open or not
-   */
-  public void setRingClaw(boolean open) {
-    if (open) {
-      ringClaw.setPosition(0);
-    } else {
-      ringClaw.setPosition(0.2);
-    }
-  }
-  
-  /**
-   * "Kicks" the ring claw outwards to knock any rings off of our pointy part
-   */
-  public void ringClawKick() {
-    ringClaw.setPosition(1);
-  }
-
-  /**
    * Sets the arm servo to the position you give it
    * @param position the position you want the arm servo to go to
    */
   public void setWobbleArm(double position) {
     wobbleArm.setPosition(position);
   }
-  
-  /**
-   * Sets the ring arm target it should P to
-   * @param target the count of encoder ticks the ring arm should try to stay at
-   */
-  public void setRingArmTarget(int target) {
-    ringArmTargetPosition = target;
-  }
-  
-  /**
-   * Increments the ring arm target by the given value
-   * @param val the number of ticks (can be negative) you want to increment the ring arm target by
-   */
-  public void incrementRingArm(int val) {
-    ringArmTargetPosition += val;
-  }
-  
-  /**
-   * Should be called once every loop (or, in the case of auto, very often)
-   * Does things like telemetry (although not right now) and other stuff we want to run often,
-   * like making sure the arm stays where it's supposed to
-   */
-  public void periodic() {
-    ringArm.setPower((ringArmTargetPosition - ringArm.getCurrentPosition()) * Constants.arm_kP);
-  }
+    
   
   /**
    * Sets the zero power behavior (either BRAKE or FLOAT) of the drivetrain motors

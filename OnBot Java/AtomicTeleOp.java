@@ -7,8 +7,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.CustomRobot;
+import com.qualcomm.robotcore.exception.TargetPositionNotSetException;
 
-@TeleOp(name="TeleOp", group="Iterative Opmode")
+@TeleOp(name="AtomicTeleOp", group="Iterative Opmode")
 public class AtomicTeleOp extends OpMode
 {
     // Declare OpMode members.
@@ -36,9 +37,7 @@ public class AtomicTeleOp extends OpMode
     @Override
     public void start() {
         runtime.reset();
-        robot.setRingClaw(true);
         robot.setWobbleArm(Constants.wobbleServoUp);
-        robot.incrementRingArm(20);
     }
 
     /*
@@ -52,22 +51,6 @@ public class AtomicTeleOp extends OpMode
             float tempLeftStickY = Math.copySign(gamepad1.left_stick_y * gamepad1.left_stick_y, gamepad1.left_stick_y);
             float tempRightStickX = Math.copySign(gamepad1.right_stick_x * gamepad1.right_stick_x, gamepad1.right_stick_x);
             robot.driveTeleOp(tempLeftStickX, tempLeftStickY, tempRightStickX);
-
-            // ring arm
-            if (gamepad2.right_bumper) {
-                robot.incrementRingArm(1);
-            } else if (gamepad2.left_bumper) {
-                robot.incrementRingArm(-1);
-            }
-
-            // ring claw
-            if (gamepad2.y) {
-                robot.setRingClaw(true);
-            } else if (gamepad2.x) {
-                robot.setRingClaw(false);
-            } else if (gamepad2.back) {
-                robot.ringClawKick();
-            }
 
             // wobble goal arm
             if (gamepad2.dpad_up) {
@@ -85,8 +68,6 @@ public class AtomicTeleOp extends OpMode
                 robot.setWobbleClaw(false);
             }
 
-            // finally
-            robot.periodic();
         } catch (TargetPositionNotSetException targetPosError) {
             telemetry.addData("The target position error happened again", "");
         }
