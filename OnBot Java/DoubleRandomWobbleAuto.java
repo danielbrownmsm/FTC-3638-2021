@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.Const;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -29,7 +30,7 @@ public class DoubleRandomWobbleAuto extends LinearOpMode {
         /** Drop the wobble goal */
         wobble.setArm(Constants.wobbleServoLeft); // move the arm back over
         sleep(3000); // wait a sec for the servo
-        wobble.setClaw(true); // open seasame
+        wobble.setClaw(Constants.wobbleClawOpen); // open seasame
         sleep(1000); // same thing
         wobble.setArm(Constants.wobbleServoUp); // move the arm out of the way
         sleep(1000); // same thing
@@ -49,7 +50,7 @@ public class DoubleRandomWobbleAuto extends LinearOpMode {
         /** Pick up the other wobble goal */
         wobble.setArm(Constants.wobbleServoLeft);
         sleep(2000);
-        wobble.setClaw(false); // close it
+        wobble.setClaw(Constants.wobbleClawClosed); // close it
         sleep(2000);
         wobble.setArm(Constants.wobbleServoUp);
         sleep(3000); // lifting is hard
@@ -63,13 +64,13 @@ public class DoubleRandomWobbleAuto extends LinearOpMode {
         /** Spin */
         drivetrain.resetEncoders(); // prepare ourselves
         drivetrain.setHeading(); // to drive
-        while(!robot.turnToHeading(180)) { // does the actual turning
+        while(!drivetrain.turnToHeading(180)) { // does the actual turning
         }
 
         /** Drop the wobble goal */
         wobble.setArm(Constants.wobbleServoLeft); // move the arm back over
         sleep(3000); // wait a sec for the servo
-        wobble.setClaw(true); // open seasame
+        wobble.setClaw(Constants.wobbleClawOpen); // open seasame
         sleep(1000); // same thing
         wobble.setArm(Constants.wobbleServoUp); // move the arm out of the way
         sleep(1000); // same thing

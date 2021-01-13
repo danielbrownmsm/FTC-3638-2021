@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -21,13 +23,7 @@ public class DrivetrainSubsystem {
     private BNO055IMU.Parameters imuParameters;
     private BNO055IMU imu1;
     private BNO055IMU imu2;
-
-    private imuParameters = new BNO055IMU.Parameters();
-    imuParameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-    imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-    imuParameters.mode = BNO055IMU.SensorMode.IMU;
-    imuParameters.temperatureUnit = BNO055IMU.TempUnit.FARENHEIT;
-    imuParameters.accelerationIntegrationAlgorithm = null;
+    private float lastHeading = 0;
 
     private Telemetry telemetry;
 
@@ -41,10 +37,10 @@ public class DrivetrainSubsystem {
      */
     public void init(HardwareMap map) {  
         /** Create all our motors */
-        leftFront = map.get(DcMotorImplEx.class, "front_left");
-        rightFront = map.get(DcMotorImplEx.class, "front_right");
-        leftBack = map.get(DcMotorImplEx.class, "back_left");
-        rightBack = map.get(DcMotorImplEx.class, "back_right");
+        leftFront = map.get(AtomicMotor.class, "front_left");
+        rightFront = map.get(AtomicMotor.class, "front_right");
+        leftBack = map.get(AtomicMotor.class, "back_left");
+        rightBack = map.get(AtomicMotor.class, "back_right");
         
         /** Use the method in AtomicMotor to initialize the motors with the values we normally use */
         leftFront.init();
@@ -57,6 +53,14 @@ public class DrivetrainSubsystem {
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
+        
+        /** Friggin undocumented bits */
+        imuParameters = new BNO055IMU.Parameters();
+        imuParameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        imuParameters.mode = BNO055IMU.SensorMode.IMU;
+        imuParameters.temperatureUnit = BNO055IMU.TempUnit.FARENHEIT;
+        imuParameters.accelerationIntegrationAlgorithm = null;
         
         /** Sensors */
         imu1 = map.get(BNO055IMU.class, "imu 1");
@@ -158,8 +162,8 @@ public class DrivetrainSubsystem {
      */
     public boolean strafeDistance(double inches) {
         if (Math.abs(getInches(getEncoderAverage())) < Math.abs(inches)) { // if we haven't reached where we need to go
-            driveTeleOp(0, ((inches - getInches(getEncoderAverage())) * Constants.drive_kP), 
-                        ((lastHeading - getYaw()) * Constants.turn_kP)); // drive there proportionally to how far away we are, and straight
+            driveTeleOp((float) 0.0, (float) ((inches - getInches(getEncoderAverage())) * Constants.drive_kP), 
+                        (float) ((lastHeading - getYaw()) * (float) Constants.turn_kP)); // drive there proportionally to how far away we are, and straight
           return false; // we haven't reached it yet
         } else {
             driveTeleOp(0, 0, 0);
@@ -202,6 +206,6 @@ public class DrivetrainSubsystem {
     }
 
     public void postImuStatus() {
-        telemetry.addData("IMU calibrated: ", isGyroCalibrated())
+        telemetry.addData("IMU calibrated: ", isGyroCalibrated());
     }
 }

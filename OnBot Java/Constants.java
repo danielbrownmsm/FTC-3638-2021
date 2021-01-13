@@ -14,4 +14,7 @@ public class Constants {
   public static final double wobbleServoLeft = 0.85;
   public static final double wobbleServoRight = 0.2;
   public static final double wobbleServoDown = 0;
+  
+  public static final double wobbleClawOpen = 0.5;
+  public static final double wobbleClawClosed = 1;
 }

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.hardware.ServoImpleEx;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class WobbleSubsystem {
@@ -27,17 +28,17 @@ public class WobbleSubsystem {
 
     public void setClawStatus(boolean enabled) {
         if (enabled) {
-            wobbleClaw.setPWMEnable();
+            wobbleClaw.setPwmEnable();
         } else {
-            wobbleClaw.setPWMDisable();
+            wobbleClaw.setPwmDisable();
         }
     }
 
     public void setArmStatus(boolean enabled) {
         if (enabled) {
-            wobbleArm.setPWMEnable();
+            wobbleArm.setPwmEnable();
         } else {
-            wobbleArm.setPWMDisable();
+            wobbleArm.setPwmDisable();
         }
     }
 

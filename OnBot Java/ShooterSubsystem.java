@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.hardware.CRServoImpleEx;
+import com.qualcomm.robotcore.hardware.CRServoImplEx;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import com.qualcomm.robotcore.hardware.DcMotorImplEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class ShooterSubsystem {
@@ -14,7 +17,7 @@ public class ShooterSubsystem {
     }
 
     public void init(HardwareMap map) {
-        shooter = map.get(DcMotorImplEx.class, "shooter");
+        shooter = map.get(AtomicMotor.class, "shooter");
         shooter.init();
         shooter.setDirection(DcMotorSimple.Direction.REVERSE);
 

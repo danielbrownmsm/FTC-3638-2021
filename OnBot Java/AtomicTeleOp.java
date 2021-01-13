@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import org.firstinspires.ftc.robotcore.external.Const;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.CustomRobot;
 import com.qualcomm.robotcore.exception.TargetPositionNotSetException;
 
 @TeleOp(name="AtomicTeleOp", group="Iterative Opmode")
@@ -68,14 +68,14 @@ public class AtomicTeleOp extends OpMode
 
             // wobble goal claw
             if (gamepad2.a) {
-                wobble.setClaw(true);
+                wobble.setClaw(Constants.wobbleClawOpen);
             } else if (gamepad2.b) {
-                wobble.setClaw(false);
+                wobble.setClaw(Constants.wobbleClawClosed);
             }
 
-            if (gamepad2.leftBumper) {
+            if (gamepad2.left_bumper) {
                 shooter.warmUp(1);
-            } else if (gamepad2.rightBumper) {
+            } else if (gamepad2.right_bumper) {
                 shooter.shoot(1);
             }
 
