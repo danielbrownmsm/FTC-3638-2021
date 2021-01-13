@@ -8,7 +8,7 @@ public class Constants {
   public static final double headingThreshold = 0.1; // tune
   public static final double TICKS_PER_REVOLUTION = 512;
   public static final double WHEEL_DIAMETER = 4;
-  public static final int driftDistance = 20; // robot kinda drifts for 20 inches cause momentum
+  public static final int driftDistance = 20; // tune
 
   public static final double wobbleServoUp = 0.4;
   public static final double wobbleServoLeft = 0.85;

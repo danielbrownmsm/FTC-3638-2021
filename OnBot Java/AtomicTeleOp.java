@@ -14,14 +14,19 @@ public class AtomicTeleOp extends OpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-    private CustomRobot robot = new CustomRobot();
+
+    private DrivetrainSubsystem drivetrain = new DrivetrainSubsystem(telemetry);
+    private WobbleSubsystem wobble = new WobbleSubsystem(telemetry);
+    private ShooterSubsystem shooter = new ShooterSubsystem(telemetry);
 
     /*
      * Code to run ONCE when the driver hits INIT
      */
     @Override
     public void init() {
-        robot.init(hardwareMap);
+        drivetrain.init(hardwareMap);
+        wobble.init(hardwareMap);
+        shooter.init(hardwareMap);
     }
 
     /*
@@ -29,6 +34,7 @@ public class AtomicTeleOp extends OpMode
      */
     @Override
     public void init_loop() {
+        drivetrain.postImuStatus();
     }
 
     /*
@@ -37,7 +43,6 @@ public class AtomicTeleOp extends OpMode
     @Override
     public void start() {
         runtime.reset();
-        robot.setWobbleArm(Constants.wobbleServoUp);
     }
 
     /*
@@ -50,26 +55,36 @@ public class AtomicTeleOp extends OpMode
             float tempLeftStickX = Math.copySign(gamepad1.left_stick_x * gamepad1.left_stick_x, gamepad1.left_stick_x);
             float tempLeftStickY = Math.copySign(gamepad1.left_stick_y * gamepad1.left_stick_y, gamepad1.left_stick_y);
             float tempRightStickX = Math.copySign(gamepad1.right_stick_x * gamepad1.right_stick_x, gamepad1.right_stick_x);
-            robot.driveTeleOp(tempLeftStickX, tempLeftStickY, tempRightStickX);
+            drivetrain.driveTeleOp(tempLeftStickX, tempLeftStickY, tempRightStickX);
 
             // wobble goal arm
             if (gamepad2.dpad_up) {
-                robot.setWobbleArm(Constants.wobbleServoUp);
+                wobble.setArm(Constants.wobbleServoUp);
             } else if (gamepad2.dpad_left) {
-                robot.setWobbleArm(Constants.wobbleServoLeft);
+                wobble.setArm(Constants.wobbleServoLeft);
             } else if (gamepad2.dpad_right) {
-                robot.setWobbleArm(Constants.wobbleServoRight);
+                wobble.setArm(Constants.wobbleServoRight);
             }
 
             // wobble goal claw
             if (gamepad2.a) {
-                robot.setWobbleClaw(true);
+                wobble.setClaw(true);
             } else if (gamepad2.b) {
-                robot.setWobbleClaw(false);
+                wobble.setClaw(false);
             }
+
+            if (gamepad2.leftBumper) {
+                shooter.warmUp(1);
+            } else if (gamepad2.rightBumper) {
+                shooter.shoot(1);
+            }
+
+            telemetry.update();
 
         } catch (TargetPositionNotSetException targetPosError) {
             telemetry.addData("The target position error happened again", "");
+        } catch (Exception exception) {
+            telemetry.addData("Exception occured", exception.toString());
         }
     }
 
@@ -78,7 +93,6 @@ public class AtomicTeleOp extends OpMode
      */
     @Override
     public void stop() {
-        //robot.stop();
     }
 
 }
