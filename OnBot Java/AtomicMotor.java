@@ -5,19 +5,38 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 
-public class AtomicMotor extends DcMotorImplEx {
-    public AtomicMotor(DcMotorController controller, int port, DcMotor.Direction direction, MotorConfigurationType conf) {
-        super(controller, port, direction, conf);
+public class AtomicMotor {
+    private DcMotorImplEx motor;
+    
+    public AtomicMotor(DcMotorImplEx motor) {
+        this.motor = motor;
     }
     
     public void init() {
-        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         resetEncoder();
-        setPower(0);
+        motor.setPower(0);
     }
 
     public void resetEncoder() {
-        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
+    
+    public void setPower(double power) {
+        motor.setPower(power);
+    }
+    
+    public void setDirection(DcMotor.Direction direction) {
+        motor.setDirection(direction);
+    }
+    
+    public int getCurrentPosition() {
+        return motor.getCurrentPosition();
+    }
+    
+    public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior b) {
+        motor.setZeroPowerBehavior(b);
+    }
+    
 }

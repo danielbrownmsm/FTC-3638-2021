@@ -73,10 +73,19 @@ public class AtomicTeleOp extends OpMode
                 wobble.setClaw(Constants.wobbleClawClosed);
             }
 
-            if (gamepad2.left_bumper) {
+            /*if (gamepad2.left_bumper) {
                 shooter.warmUp(1);
             } else if (gamepad2.right_bumper) {
                 shooter.shoot(1);
+            } else if (gamepad2.b) {
+                shooter.shoot(0);
+            }*/
+            
+            shooter.setTrigger(gamepad2.right_trigger);
+            if (gamepad2.a) {
+                shooter.warmUp(1);
+            } else {
+                shooter.warmUp(0);
             }
 
             telemetry.update();

@@ -37,10 +37,10 @@ public class DrivetrainSubsystem {
      */
     public void init(HardwareMap map) {  
         /** Create all our motors */
-        leftFront = map.get(AtomicMotor.class, "front_left");
-        rightFront = map.get(AtomicMotor.class, "front_right");
-        leftBack = map.get(AtomicMotor.class, "back_left");
-        rightBack = map.get(AtomicMotor.class, "back_right");
+        leftFront = new AtomicMotor(map.get(DcMotorImplEx.class, "front_left"));
+        rightFront = new AtomicMotor(map.get(DcMotorImplEx.class, "front_right"));
+        leftBack = new AtomicMotor(map.get(DcMotorImplEx.class, "back_left"));
+        rightBack = new AtomicMotor(map.get(DcMotorImplEx.class, "back_right"));
         
         /** Use the method in AtomicMotor to initialize the motors with the values we normally use */
         leftFront.init();
