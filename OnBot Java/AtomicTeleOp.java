@@ -92,8 +92,10 @@ public class AtomicTeleOp extends OpMode
 
         } catch (TargetPositionNotSetException targetPosError) {
             telemetry.addData("The target position error happened again", "");
+            telemetry.update();
         } catch (Exception exception) {
             telemetry.addData("Exception occured", exception.toString());
+            telemetry.update();
         }
     }
 

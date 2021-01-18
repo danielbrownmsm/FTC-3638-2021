@@ -58,6 +58,7 @@ public class DrivetrainSubsystem {
         imuParameters = new BNO055IMU.Parameters();
         imuParameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        imuParameters.calibrationDataFile = "AdafruitIMUCalibration.json.json";
         imuParameters.mode = BNO055IMU.SensorMode.IMU;
         imuParameters.temperatureUnit = BNO055IMU.TempUnit.FARENHEIT;
         imuParameters.accelerationIntegrationAlgorithm = null;
@@ -147,7 +148,7 @@ public class DrivetrainSubsystem {
      */
     public boolean driveDistance(double inches) {
         if (Math.abs(getInches(getEncoderAverage())) < Math.abs(inches)) { // if we haven't reached where we need to go
-            arcadeDrive((inches - getInches(getEncoderAverage())) * Constants.drive_kP, 
+            arcadeDrive((inches - getInches(getEncoderAverage())) * -Constants.drive_kP, 
                         (lastHeading - getYaw()) * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
             return false; // we haven't reached it yet
         } else {
@@ -175,8 +176,8 @@ public class DrivetrainSubsystem {
      * Gets the current gyro yaw angle (so, turning stuff)
      * @return the yaw of the gyro
      */
-    public float getYaw() {
-        return imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
+    public float getYaw() { 
+        return imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).thirdAngle;
     }
   
     /**
