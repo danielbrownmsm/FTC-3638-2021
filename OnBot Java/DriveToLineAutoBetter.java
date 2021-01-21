@@ -18,7 +18,7 @@ public class DriveToLineAutoBetter extends LinearOpMode {
 
         drivetrain.resetEncoders(); // prepare ourselves
         drivetrain.setHeading(); // to drive
-        while(!drivetrain.driveDistance(75 - Constants.driftDistance)) { // this part up here drives
+        while(!drivetrain.driveDistance(82 - Constants.driftDistance)) { // this part up here drives
         }
     }
 }

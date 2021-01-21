@@ -67,10 +67,10 @@ public class AtomicTeleOp extends OpMode
             }
 
             // wobble goal claw
-            if (gamepad2.a) {
-                wobble.setClaw(Constants.wobbleClawOpen);
-            } else if (gamepad2.b) {
+            if (gamepad2.x) {
                 wobble.setClaw(Constants.wobbleClawClosed);
+            } else if (gamepad2.y) {
+                wobble.setClaw(Constants.wobbleClawOpen);
             }
 
             /*if (gamepad2.left_bumper) {

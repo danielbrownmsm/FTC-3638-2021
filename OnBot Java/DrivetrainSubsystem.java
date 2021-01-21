@@ -152,6 +152,7 @@ public class DrivetrainSubsystem {
                         (lastHeading - getYaw()) * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
             return false; // we haven't reached it yet
         } else {
+            arcadeDrive(0, 0);
             return true; // we're here!
         }
     }
@@ -162,12 +163,12 @@ public class DrivetrainSubsystem {
      * @return if we've reached the distance or not
      */
     public boolean strafeDistance(double inches) {
-        if (Math.abs(getInches(getEncoderAverage())) < Math.abs(inches)) { // if we haven't reached where we need to go
-            driveTeleOp((float) 0.0, (float) ((inches - getInches(getEncoderAverage())) * Constants.drive_kP), 
+        if (Math.abs(getInches(getRightEncoderAverage())) < Math.abs(inches)) { // if we haven't reached where we need to go
+            driveTeleOp((float) 0.0, (float) ((inches - getInches(getRightEncoderAverage())) * Constants.drive_kP), 
                         (float) ((lastHeading - getYaw()) * (float) Constants.turn_kP)); // drive there proportionally to how far away we are, and straight
           return false; // we haven't reached it yet
         } else {
-            driveTeleOp(0, 0, 0);
+            arcadeDrive(0, 0);
             return true; // we're here!
         }
     }
@@ -189,6 +190,7 @@ public class DrivetrainSubsystem {
             arcadeDrive(0, (lastHeading + heading - getYaw()) * Constants.turn_kP); // turn in-place, proportionally
             return false;
         } else {
+            arcadeDrive(0, 0);
             return true; // we have reached that heading
         }
     }
@@ -208,5 +210,6 @@ public class DrivetrainSubsystem {
 
     public void postImuStatus() {
         telemetry.addData("IMU calibrated: ", isGyroCalibrated());
+        telemetry.update();
     }
 }

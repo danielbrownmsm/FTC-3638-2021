@@ -19,12 +19,15 @@ public class DoubleRandomWobbleAuto extends LinearOpMode {
         drivetrain.init(hardwareMap);
         wobble.init(hardwareMap);
         shooter.init(hardwareMap);
+
+        wobble.setArm(Constants.wobbleServoUp);
+        wobble.setClaw(Constants.wobbleClawClosed);
         waitForStart();
     
         /** Drive to the "B" target zone */
         drivetrain.resetEncoders(); // prepare ourselves
         drivetrain.setHeading(); // to drive
-        while(!drivetrain.driveDistance(120 - Constants.driftDistance)) { // does the actual driving
+        while(!drivetrain.driveDistance(105 - Constants.driftDistance)) { // does the actual driving
         }
     
         /** Drop the wobble goal */
@@ -38,7 +41,7 @@ public class DoubleRandomWobbleAuto extends LinearOpMode {
         /** Drive back to the other wobble goal */
         drivetrain.resetEncoders(); // prepare ourselves
         drivetrain.setHeading(); // to drive
-        while(!drivetrain.driveDistance(-100 + Constants.driftDistance)) { // does the actual driving
+        while(!drivetrain.driveDistance(-70 + Constants.driftDistance)) { // does the actual driving
         }
 
         /** Strafe to pick up the other wobble goal */
