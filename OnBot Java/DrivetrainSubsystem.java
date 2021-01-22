@@ -124,7 +124,15 @@ public class DrivetrainSubsystem {
     public double getRightEncoderAverage() {
         return (rightFront.getCurrentPosition() + rightBack.getCurrentPosition()) / 2;
     }
-  
+
+    /**
+     * Gets the average of the back encoders
+     * @return the average of the encoders on the back side of the drivetrain
+     */
+    public double getStrafeEncoderAverage() {
+        return (leftBack.getCurrentPosition() + rightFront.getCurrentPosition()) / 2;
+    }
+
     /**
      * Given a tick count, returns that distance in inches
      * @param ticks the number of ticks of the encoder
@@ -150,6 +158,7 @@ public class DrivetrainSubsystem {
         if (Math.abs(getInches(getEncoderAverage())) < Math.abs(inches)) { // if we haven't reached where we need to go
             arcadeDrive((inches - getInches(getEncoderAverage())) * -Constants.drive_kP, 
                         (lastHeading - getYaw()) * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
+            telemetry.addData("distance error", inches - getInches(getEncoderAverage()));
             return false; // we haven't reached it yet
         } else {
             arcadeDrive(0, 0);
@@ -163,10 +172,11 @@ public class DrivetrainSubsystem {
      * @return if we've reached the distance or not
      */
     public boolean strafeDistance(double inches) {
-        if (Math.abs(getInches(getRightEncoderAverage())) < Math.abs(inches)) { // if we haven't reached where we need to go
-            driveTeleOp((float) 0.0, (float) ((inches - getInches(getRightEncoderAverage())) * Constants.drive_kP), 
-                        (float) ((lastHeading - getYaw()) * (float) Constants.turn_kP)); // drive there proportionally to how far away we are, and straight
-          return false; // we haven't reached it yet
+        if (Math.abs(getInches(getStrafeEncoderAverage())) < Math.abs(inches)) { // if we haven't reached where we need to go
+            driveTeleOp((float) ((inches - getInches(getStrafeEncoderAverage())) * Constants.strafe_kP), 0.0f, 0.0f); 
+                        //(float) ((lastHeading - getYaw()) * (float) Constants.turn_kP)); // drive there proportionally to how far away we are, and straight
+            telemetry.addData("strafe error", inches - getInches(getStrafeEncoderAverage()));
+            return false; // we haven't reached it yet
         } else {
             arcadeDrive(0, 0);
             return true; // we're here!
@@ -178,6 +188,7 @@ public class DrivetrainSubsystem {
      * @return the yaw of the gyro
      */
     public float getYaw() { 
+        telemetry.addData("heading", imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).thirdAngle);
         return imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).thirdAngle;
     }
   
@@ -186,8 +197,8 @@ public class DrivetrainSubsystem {
      * @param heading the heading you want to turn to, relative to the robot
      */
     public boolean turnToHeading(float heading) {
-        if (lastHeading + heading - getYaw() > Constants.headingThreshold) { // if the error is less than our threshold
-            arcadeDrive(0, (lastHeading + heading - getYaw()) * Constants.turn_kP); // turn in-place, proportionally
+        if (lastHeading + heading - 180 - getYaw() > Constants.headingThreshold) { // if the error is less than our threshold
+            arcadeDrive(0, (lastHeading + heading - 180 - getYaw()) * Constants.turn_kP); // turn in-place, proportionally
             return false;
         } else {
             arcadeDrive(0, 0);
