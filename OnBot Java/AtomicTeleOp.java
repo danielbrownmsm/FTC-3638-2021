@@ -58,18 +58,18 @@ public class AtomicTeleOp extends OpMode
             drivetrain.driveTeleOp(tempLeftStickX, tempLeftStickY, tempRightStickX);
 
             // wobble goal arm
-            if (gamepad2.dpad_up) {
+            if (gamepad1.dpad_up) {
                 wobble.setArm(Constants.wobbleServoUp);
-            } else if (gamepad2.dpad_left) {
+            } else if (gamepad1.dpad_left) {
                 wobble.setArm(Constants.wobbleServoLeft);
-            } else if (gamepad2.dpad_right) {
+            } else if (gamepad1.dpad_right) {
                 wobble.setArm(Constants.wobbleServoRight);
             }
 
             // wobble goal claw
-            if (gamepad2.x) {
+            if (gamepad1.x) {
                 wobble.setClaw(Constants.wobbleClawClosed);
-            } else if (gamepad2.y) {
+            } else if (gamepad1.y) {
                 wobble.setClaw(Constants.wobbleClawOpen);
             }
 
@@ -81,8 +81,8 @@ public class AtomicTeleOp extends OpMode
                 shooter.shoot(0);
             }*/
             
-            shooter.setTrigger(gamepad2.right_trigger);
-            if (gamepad2.a) {
+            shooter.setTrigger(gamepad1.right_trigger);
+            if (gamepad1.a) {
                 shooter.warmUp(1);
             } else {
                 shooter.warmUp(0);

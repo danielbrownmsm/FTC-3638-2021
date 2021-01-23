@@ -58,7 +58,7 @@ public class DrivetrainSubsystem {
         imuParameters = new BNO055IMU.Parameters();
         imuParameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        imuParameters.calibrationDataFile = "AdafruitIMUCalibration.json.json";
+        imuParameters.calibrationDataFile = "AdafruitIMUCalibration.json";
         imuParameters.mode = BNO055IMU.SensorMode.IMU;
         imuParameters.temperatureUnit = BNO055IMU.TempUnit.FARENHEIT;
         imuParameters.accelerationIntegrationAlgorithm = null;
@@ -188,8 +188,9 @@ public class DrivetrainSubsystem {
      * @return the yaw of the gyro
      */
     public float getYaw() { 
-        telemetry.addData("heading", imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).thirdAngle);
-        return imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).thirdAngle;
+        float tempHeading = imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).thirdAngle;
+        telemetry.addData("heading", tempHeading);
+        return tempHeading;
     }
   
     /**
@@ -197,11 +198,12 @@ public class DrivetrainSubsystem {
      * @param heading the heading you want to turn to, relative to the robot
      */
     public boolean turnToHeading(float heading) {
-        if (lastHeading + heading - 180 - getYaw() > Constants.headingThreshold) { // if the error is less than our threshold
+        if (lastHeading + heading - 180 - getYaw() < 0.1) { // if the error is less than our threshold
             arcadeDrive(0, (lastHeading + heading - 180 - getYaw()) * Constants.turn_kP); // turn in-place, proportionally
+            telemetry.addData("reading", lastHeading + heading - 180 - getYaw());
             return false;
         } else {
-            arcadeDrive(0, 0);
+            arcadeDrive(0, 0);  
             return true; // we have reached that heading
         }
     }
