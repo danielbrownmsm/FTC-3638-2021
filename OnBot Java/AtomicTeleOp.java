@@ -64,6 +64,8 @@ public class AtomicTeleOp extends OpMode
                 wobble.setArm(Constants.wobbleServoLeft);
             } else if (gamepad1.dpad_right) {
                 wobble.setArm(Constants.wobbleServoRight);
+            } else if (gamepad1.dpad_down) {
+                wobble.setArm(Constants.wobbleServoDown);
             }
 
             // wobble goal claw
