@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import org.firstinspires.ftc.robotcore.external.Const;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.CustomRobot;
 import com.qualcomm.robotcore.exception.TargetPositionNotSetException;
 
 @TeleOp(name="AtomicTeleOp", group="Iterative Opmode")
@@ -58,33 +58,46 @@ public class AtomicTeleOp extends OpMode
             drivetrain.driveTeleOp(tempLeftStickX, tempLeftStickY, tempRightStickX);
 
             // wobble goal arm
-            if (gamepad2.dpad_up) {
+            if (gamepad1.dpad_up) {
                 wobble.setArm(Constants.wobbleServoUp);
-            } else if (gamepad2.dpad_left) {
+            } else if (gamepad1.dpad_left) {
                 wobble.setArm(Constants.wobbleServoLeft);
-            } else if (gamepad2.dpad_right) {
+            } else if (gamepad1.dpad_right) {
                 wobble.setArm(Constants.wobbleServoRight);
+            } else if (gamepad1.dpad_down) {
+                wobble.setArm(Constants.wobbleServoDown);
             }
 
             // wobble goal claw
-            if (gamepad2.a) {
-                wobble.setClaw(true);
-            } else if (gamepad2.b) {
-                wobble.setClaw(false);
+            if (gamepad1.x) {
+                wobble.setClaw(Constants.wobbleClawClosed);
+            } else if (gamepad1.y) {
+                wobble.setClaw(Constants.wobbleClawOpen);
             }
 
-            if (gamepad2.leftBumper) {
+            /*if (gamepad2.left_bumper) {
                 shooter.warmUp(1);
-            } else if (gamepad2.rightBumper) {
+            } else if (gamepad2.right_bumper) {
                 shooter.shoot(1);
+            } else if (gamepad2.b) {
+                shooter.shoot(0);
+            }*/
+            
+            shooter.setTrigger(gamepad1.right_trigger);
+            if (gamepad1.a) {
+                shooter.warmUp(1);
+            } else {
+                shooter.warmUp(0);
             }
 
             telemetry.update();
 
         } catch (TargetPositionNotSetException targetPosError) {
             telemetry.addData("The target position error happened again", "");
+            telemetry.update();
         } catch (Exception exception) {
             telemetry.addData("Exception occured", exception.toString());
+            telemetry.update();
         }
     }
 
