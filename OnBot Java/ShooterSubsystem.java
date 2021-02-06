@@ -33,6 +33,7 @@ public class ShooterSubsystem {
     }
 
     public void shoot(double power) {
+        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         shooter.setPower(power);
         trigger.setPower(power);
     }
