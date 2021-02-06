@@ -1,0 +1,8 @@
+Problem: motor on expansion hub will revert to zeroPowerBehavior.BRAKE after losing connection with the control hub then reconnecting. Setting it to zeroPowerBehavior.FLOAT doesn't change this, but also doesn't throw an error.
+
+RC: (Control Hub) OS v. 1.1.2, Android v. 7.1.2, Expansion Hub v. 1.8.2, RC v. 6.1 with an extra expansion hub connected through the RS485 port
+DS: moto e5 play android v. 8.0 running DS v. 6.1
+
+[log](https://github.com/FIRST-Tech-Challenge/FtcRobotController/files/5937330/robotControllerLog.2.txt) is here, with logging low-level events set to true
+
+code can be found [here](https://github.com/danielbrownmsm/FTC-3638-2021) (the AtomicTeleOp, when running the shooter motor in the ShooterSubsystem)
