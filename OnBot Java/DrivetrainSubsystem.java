@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -24,6 +28,8 @@ public class DrivetrainSubsystem {
     private BNO055IMU imu1;
     private BNO055IMU imu2;
     private float lastHeading = 0;
+    
+    private NormalizedColorSensor colorSensor;
 
     private Telemetry telemetry;
 
@@ -69,6 +75,21 @@ public class DrivetrainSubsystem {
   
         imu2 = map.get(BNO055IMU.class, "imu 2");
         imu2.initialize(imuParameters); // initialize the imu
+        
+        colorSensor = map.get(NormalizedColorSensor.class, "rev_color_sensor");
+        colorSensor.setGain(4);
+    }
+    
+    public void postColorSensor() {
+        NormalizedRGBA colors = colorSensor.getNormalizedColors();
+        telemetry.addData("Red", colors.red);
+        telemetry.addData("Green", colors.green);
+        telemetry.addData("Blue", colors.blue);
+        telemetry.addData("Distance", ((DistanceSensor) colorSensor).getDistance(DistanceUnit.INCH));
+    }
+  
+    public double getDistanceSensor() {
+        return ((DistanceSensor) colorSensor).getDistance(DistanceUnit.INCH);
     }
   
     /**
