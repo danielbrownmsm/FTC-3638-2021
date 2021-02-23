@@ -28,8 +28,9 @@ public class DrivetrainSubsystem {
     private BNO055IMU imu1;
     private BNO055IMU imu2;
     private float lastHeading = 0;
-    
+
     private NormalizedColorSensor colorSensor;
+    private double[] distances = {0.0, 0.0, 0.0, 0.0, 0.0};
 
     private Telemetry telemetry;
 
@@ -87,9 +88,18 @@ public class DrivetrainSubsystem {
         telemetry.addData("Blue", colors.blue);
         telemetry.addData("Distance", ((DistanceSensor) colorSensor).getDistance(DistanceUnit.INCH));
     }
+
+    public void setDistanceArrayThing(double index) {
+        distances[index] = ((DistanceSensor) colorSensor).getDistance(DistanceUnit.INCH);
+    }
   
-    public double getDistanceSensor() {
-        return ((DistanceSensor) colorSensor).getDistance(DistanceUnit.INCH);
+    public double getRingCount() {
+        Arrays.sort(distances); // sort our distances
+        double distance = distances[3]; // get the median
+        if (distance < 20) {
+            return 4;
+        }
+        return 0;
     }
   
     /**
@@ -249,5 +259,10 @@ public class DrivetrainSubsystem {
     public void postImuStatus() {
         telemetry.addData("IMU calibrated: ", isGyroCalibrated());
         telemetry.update();
+    }
+
+    public void postTelemetry() {
+        telemetry.addData("Ring Count", getRingCount());
+        telemetry.addData("")
     }
 }

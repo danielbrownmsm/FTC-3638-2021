@@ -34,9 +34,9 @@ public class GoodWobbleAuto extends LinearOpMode {
         }
         
         sleep(1000); // wait a bit to get a steady reading
-        if (drivetrain.getDistanceSensor() < 20) { // NaN not equal to itself
+        if (drivetrain.getRingCount() == 4) { // target zone C
             inchesToDrive = 123 - 22; // -24 b/c we've already driven that much to get to the rings
-        } else {
+        } else { // target zone A, assumes no rings
             inchesToDrive = 74 - 22;
         }
         

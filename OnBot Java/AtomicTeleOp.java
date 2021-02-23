@@ -51,10 +51,13 @@ public class AtomicTeleOp extends OpMode
     @Override
     public void loop() {
         try {
-            // driving (square inputs)
-            float tempLeftStickX = Math.copySign(gamepad1.left_stick_x * gamepad1.left_stick_x, gamepad1.left_stick_x);
-            float tempLeftStickY = Math.copySign(gamepad1.left_stick_y * gamepad1.left_stick_y, gamepad1.left_stick_y);
-            float tempRightStickX = Math.copySign(gamepad1.right_stick_x * gamepad1.right_stick_x, gamepad1.right_stick_x);
+            // driving (if leftBumper pressed drive with finer control)
+            float tempLeftStickX = gamepad1.left_stick_x //Math.copySign(gamepad1.left_stick_x * gamepad1.left_stick_x, gamepad1.left_stick_x);
+            float tempLeftStickY = gamepad1.left_stick_y //Math.copySign(gamepad1.left_stick_y * gamepad1.left_stick_y, gamepad1.left_stick_y);
+            float tempRightStickX = gamepad1.right_stick_x //Math.copySign(gamepad1.right_stick_x * gamepad1.right_stick_x, gamepad1.right_stick_x);
+            tempLeftStickX /= 1 + gamepad1.left_bumper; // so half if left bumper pressed
+            tempLeftStickY /= 1 + gamepad1.left_bumper; // kinda hacky I know but whatev
+            tempRightStickX /= 1 + gamepad1.left_bumper;
             drivetrain.driveTeleOp(tempLeftStickX, tempLeftStickY, tempRightStickX);
 
             // wobble goal arm
@@ -74,14 +77,6 @@ public class AtomicTeleOp extends OpMode
             } else if (gamepad1.y) {
                 wobble.setClaw(Constants.wobbleClawOpen);
             }
-
-            /*if (gamepad2.left_bumper) {
-                shooter.warmUp(1);
-            } else if (gamepad2.right_bumper) {
-                shooter.shoot(1);
-            } else if (gamepad2.b) {
-                shooter.shoot(0);
-            }*/
             
             shooter.setTrigger(gamepad1.right_trigger);
             if (gamepad1.a) {
