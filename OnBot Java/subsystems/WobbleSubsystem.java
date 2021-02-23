@@ -26,20 +26,22 @@ public class WobbleSubsystem {
         wobbleArm.setPosition(position);
     }
 
-    public void setClawStatus(boolean enabled) {
-        if (enabled) {
-            wobbleClaw.setPwmEnable();
-        } else {
-            wobbleClaw.setPwmDisable();
-        }
-    }
-
     public void setArmStatus(boolean enabled) {
         if (enabled) {
             wobbleArm.setPwmEnable();
         } else {
             wobbleArm.setPwmDisable();
         }
+    }
+
+    public void powerSave() {
+        wobbleArm.setPwmDisable();
+        wobbleClaw.setPwmDisable();
+    }
+
+    public void unPowerSave() {
+        wobbleArm.setPwmEnable();
+        wobbleClaw.setPwmEnable();
     }
 
 }

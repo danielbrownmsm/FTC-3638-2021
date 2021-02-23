@@ -81,6 +81,11 @@ public class AtomicTeleOp extends OpMode
             shooter.setTrigger(gamepad1.right_trigger);
             if (gamepad1.a) {
                 shooter.warmUp(1);
+                drivetrain.powerSave();
+                wobble.powerSave();
+            } else if (gamepad1.right_bumper) {
+                drivetrain.unPowerSave();
+                drivetrain.unPowerSave();
             } else {
                 shooter.warmUp(0);
             }
