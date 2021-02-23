@@ -176,10 +176,12 @@ public class DrivetrainSubsystem {
      * @return if we have reached that distance or not
      */
     public boolean driveDistance(double inches) {
-        if (Math.abs(getInches(getEncoderAverage())) < Math.abs(inches)) { // if we haven't reached where we need to go
-            arcadeDrive((inches - getInches(getEncoderAverage())) * -Constants.drive_kP, 
-                        (lastHeading - getYaw()) * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
-            telemetry.addData("distance error", inches - getInches(getEncoderAverage()));
+        double distError = inches - getInches(getEncoderAverage())
+        double turnError = lastHeading - getYaw()
+        if (Math.abs(distError) < 0.1) { // if we haven't reached where we need to go
+            arcadeDrive(distError * -Constants.drive_kP, turnError * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
+            telemetry.addData("Distance Error", distError);
+            telemetry.addDate("Turn Error", turnError);
             return false; // we haven't reached it yet
         } else {
             arcadeDrive(0, 0);
@@ -193,10 +195,11 @@ public class DrivetrainSubsystem {
      * @return if we've reached the distance or not
      */
     public boolean strafeDistance(double inches) {
-        if (Math.abs(getInches(getStrafeEncoderAverage())) < Math.abs(inches)) { // if we haven't reached where we need to go
-            driveTeleOp((float) ((inches - getInches(getStrafeEncoderAverage())) * Constants.strafe_kP), 0.0f, 0.0f); 
+        double strafeError = inches - getInches(getStrafeEncoderAverage())
+        if (Math.abs(strafeError) < 0.1) { // if we haven't reached where we need to go
+            driveTeleOp((float) strafeError * Constants.strafe_kP, 0.0f, 0.0f); 
                         //(float) ((lastHeading - getYaw()) * (float) Constants.turn_kP)); // drive there proportionally to how far away we are, and straight
-            telemetry.addData("strafe error", inches - getInches(getStrafeEncoderAverage()));
+            telemetry.addData("Strafe Error", strafeError);
             return false; // we haven't reached it yet
         } else {
             arcadeDrive(0, 0);
@@ -219,9 +222,10 @@ public class DrivetrainSubsystem {
      * @param heading the heading you want to turn to, relative to the robot
      */
     public boolean turnToHeading(float heading) {
-        if (lastHeading + heading - 180 - getYaw() < 0.1) { // if the error is less than our threshold
-            arcadeDrive(0, (lastHeading + heading - 180 - getYaw()) * Constants.turn_kP); // turn in-place, proportionally
-            telemetry.addData("reading", lastHeading + heading - 180 - getYaw());
+        float error = lastHeading + heading - 180 - getYaw()
+        if (error < 0.1) { // if the error is less than our threshold
+            arcadeDrive(0, error * Constants.turn_kP); // turn in-place, proportionally
+            telemetry.addData("Turn Error", error);
             return false;
         } else {
             arcadeDrive(0, 0);  
