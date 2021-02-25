@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import java.util.Arrays;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -89,7 +90,7 @@ public class DrivetrainSubsystem {
         telemetry.addData("Distance", ((DistanceSensor) colorSensor).getDistance(DistanceUnit.INCH));
     }
 
-    public void setDistanceArrayThing(double index) {
+    public void setDistanceArrayThing(int index) {
         distances[index] = ((DistanceSensor) colorSensor).getDistance(DistanceUnit.INCH);
     }
   
@@ -186,12 +187,12 @@ public class DrivetrainSubsystem {
      * @return if we have reached that distance or not
      */
     public boolean driveDistance(double inches) {
-        double distError = inches - getInches(getEncoderAverage())
-        double turnError = lastHeading - getYaw()
+        double distError = inches - getInches(getEncoderAverage());
+        double turnError = lastHeading - getYaw();
         if (Math.abs(distError) < 0.1) { // if we haven't reached where we need to go
             arcadeDrive(distError * -Constants.drive_kP, turnError * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
             telemetry.addData("Distance Error", distError);
-            telemetry.addDate("Turn Error", turnError);
+            telemetry.addData("Turn Error", turnError);
             return false; // we haven't reached it yet
         } else {
             arcadeDrive(0, 0);
@@ -205,9 +206,9 @@ public class DrivetrainSubsystem {
      * @return if we've reached the distance or not
      */
     public boolean strafeDistance(double inches) {
-        double strafeError = inches - getInches(getStrafeEncoderAverage())
+        double strafeError = inches - getInches(getStrafeEncoderAverage());
         if (Math.abs(strafeError) < 0.1) { // if we haven't reached where we need to go
-            driveTeleOp((float) strafeError * Constants.strafe_kP, 0.0f, 0.0f); 
+            driveTeleOp((float) strafeError * (float) Constants.strafe_kP, 0.0f, 0.0f); 
                         //(float) ((lastHeading - getYaw()) * (float) Constants.turn_kP)); // drive there proportionally to how far away we are, and straight
             telemetry.addData("Strafe Error", strafeError);
             return false; // we haven't reached it yet
@@ -232,7 +233,7 @@ public class DrivetrainSubsystem {
      * @param heading the heading you want to turn to, relative to the robot
      */
     public boolean turnToHeading(float heading) {
-        float error = lastHeading + heading - 180 - getYaw()
+        float error = lastHeading + heading - 180 - getYaw();
         if (error < 0.1) { // if the error is less than our threshold
             arcadeDrive(0, error * Constants.turn_kP); // turn in-place, proportionally
             telemetry.addData("Turn Error", error);
@@ -263,17 +264,17 @@ public class DrivetrainSubsystem {
 
     public void postTelemetry() {
         telemetry.addData("Ring Count", getRingCount());
-        telemetry.addData("")
+        //telemetry.addData("");
     }
 
-    public void powerSaveMode() {
+    public void powerSave() {
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
-    public void unPowerSaveMode() {
+    public void unPowerSave() {
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

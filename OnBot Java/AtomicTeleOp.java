@@ -52,12 +52,14 @@ public class AtomicTeleOp extends OpMode
     public void loop() {
         try {
             // driving (if leftBumper pressed drive with finer control)
-            float tempLeftStickX = gamepad1.left_stick_x //Math.copySign(gamepad1.left_stick_x * gamepad1.left_stick_x, gamepad1.left_stick_x);
-            float tempLeftStickY = gamepad1.left_stick_y //Math.copySign(gamepad1.left_stick_y * gamepad1.left_stick_y, gamepad1.left_stick_y);
-            float tempRightStickX = gamepad1.right_stick_x //Math.copySign(gamepad1.right_stick_x * gamepad1.right_stick_x, gamepad1.right_stick_x);
-            tempLeftStickX /= 1 + gamepad1.left_bumper; // so half if left bumper pressed
-            tempLeftStickY /= 1 + gamepad1.left_bumper; // kinda hacky I know but whatev
-            tempRightStickX /= 1 + gamepad1.left_bumper;
+            float tempLeftStickX = gamepad1.left_stick_x; //Math.copySign(gamepad1.left_stick_x * gamepad1.left_stick_x, gamepad1.left_stick_x);
+            float tempLeftStickY = gamepad1.left_stick_y; //Math.copySign(gamepad1.left_stick_y * gamepad1.left_stick_y, gamepad1.left_stick_y);
+            float tempRightStickX = gamepad1.right_stick_x; //Math.copySign(gamepad1.right_stick_x * gamepad1.right_stick_x, gamepad1.right_stick_x);
+            //int num = ? gamepad1.left_bumper 1 : 0
+            int num =  gamepad1.left_bumper ? 1 : 0;
+            tempLeftStickX /= 1 + num; // so half if left bumper pressed
+            tempLeftStickY /= 1 + num; // kinda hacky I know but whatev
+            tempRightStickX /= 1 + num;
             drivetrain.driveTeleOp(tempLeftStickX, tempLeftStickY, tempRightStickX);
 
             // wobble goal arm
@@ -107,5 +109,4 @@ public class AtomicTeleOp extends OpMode
     @Override
     public void stop() {
     }
-
 }
