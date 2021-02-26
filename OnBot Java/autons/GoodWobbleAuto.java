@@ -28,16 +28,16 @@ public class GoodWobbleAuto extends LinearOpMode {
         /** Drive to the rings */
         drivetrain.resetEncoders(); // prepare ourselves
         drivetrain.setHeading(); // to drive
-        while(!drivetrain.driveDistance(22 - Constants.driftDistance)) { // does the actual driving
+        while(!drivetrain.driveDistance(-22 - Constants.driftDistance)) { // does the actual driving
             drivetrain.postColorSensor();
             telemetry.update();
         }
         
         sleep(1000); // wait a bit to get a steady reading
         if (drivetrain.getRingCount() == 4) { // target zone C
-            inchesToDrive = 123 - 22; // -24 b/c we've already driven that much to get to the rings
+            inchesToDrive = -123 + 22; // -24 b/c we've already driven that much to get to the rings
         } else { // target zone A, assumes no rings
-            inchesToDrive = 74 - 22;
+            inchesToDrive = -74 + 22;
         }
         
         /** Strafe because otherwise we run directly into the stack */
@@ -62,10 +62,10 @@ public class GoodWobbleAuto extends LinearOpMode {
         wobble.setArm(Constants.wobbleServoUp); // move the arm out of the way
         sleep(1000); // same thing
         
-        if (inchesToDrive > 82) {
-            inchesToDrive = -36; // the answer to Life, the Universe, and Everything
+        if (inchesToDrive < 82) {
+            inchesToDrive = 36; // the answer to Life, the Universe, and Everything
         } else {
-            inchesToDrive = -1; // we should be close
+            inchesToDrive = 1; // we should be close
         }
         
         /** Drive to the target zone */

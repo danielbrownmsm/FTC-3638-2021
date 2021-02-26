@@ -63,35 +63,36 @@ public class AtomicTeleOp extends OpMode
             drivetrain.driveTeleOp(tempLeftStickX, tempLeftStickY, tempRightStickX);
 
             // wobble goal arm
-            if (gamepad1.dpad_up) {
+            if (gamepad1.dpad_up || gamepad2.dpad_up) {
                 wobble.setArm(Constants.wobbleServoUp);
-            } else if (gamepad1.dpad_left) {
+            } else if (gamepad1.dpad_left || gamepad2.dpad_left) {
                 wobble.setArm(Constants.wobbleServoLeft);
-            } else if (gamepad1.dpad_right) {
+            } else if (gamepad1.dpad_right || gamepad2.dpad_right) {
                 wobble.setArm(Constants.wobbleServoRight);
-            } else if (gamepad1.dpad_down) {
+            } else if (gamepad1.dpad_down || gamepad2.dpad_down) {
                 wobble.setArm(Constants.wobbleServoDown);
             }
 
             // wobble goal claw
-            if (gamepad1.x) {
+            if (gamepad1.x || gamepad2.x) {
                 wobble.setClaw(Constants.wobbleClawClosed);
-            } else if (gamepad1.y) {
+            } else if (gamepad1.y || gamepad2.y) {
                 wobble.setClaw(Constants.wobbleClawOpen);
             }
             
-            shooter.setTrigger(gamepad1.right_trigger);
-            if (gamepad1.a) {
-                shooter.warmUp(1);
+            shooter.setTrigger(gamepad1.right_trigger || gamepad2.right_trigger);
+            if (gamepad1.a || gamepad2.a) {
+                shooter.shoot(runtime.milliseconds());
                 drivetrain.powerSave();
                 wobble.powerSave();
-            } else if (gamepad1.right_bumper) {
+            } else if (gamepad1.right_bumper || gamepad2.right_bumper) {
                 drivetrain.unPowerSave();
-                drivetrain.unPowerSave();
+                wobble.unPowerSave();
             } else {
-                shooter.warmUp(0);
+                shooter.stop();
             }
 
+            telemetry.addData("Shooter Speed", shooter.getSpeed());
             telemetry.update();
 
         } catch (TargetPositionNotSetException targetPosError) {
@@ -109,4 +110,5 @@ public class AtomicTeleOp extends OpMode
     @Override
     public void stop() {
     }
+
 }

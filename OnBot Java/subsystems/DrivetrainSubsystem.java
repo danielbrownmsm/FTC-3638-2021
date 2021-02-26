@@ -189,8 +189,8 @@ public class DrivetrainSubsystem {
     public boolean driveDistance(double inches) {
         double distError = inches - getInches(getEncoderAverage());
         double turnError = lastHeading - getYaw();
-        if (Math.abs(distError) < 0.1) { // if we haven't reached where we need to go
-            arcadeDrive(distError * -Constants.drive_kP, turnError * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
+        if (Math.abs(distError) > 2) { // if we haven't reached where we need to go
+            arcadeDrive(distError * Constants.drive_kP, turnError * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
             telemetry.addData("Distance Error", distError);
             telemetry.addData("Turn Error", turnError);
             return false; // we haven't reached it yet
@@ -207,7 +207,7 @@ public class DrivetrainSubsystem {
      */
     public boolean strafeDistance(double inches) {
         double strafeError = inches - getInches(getStrafeEncoderAverage());
-        if (Math.abs(strafeError) < 0.1) { // if we haven't reached where we need to go
+        if (Math.abs(strafeError) > 0.1) { // if we haven't reached where we need to go
             driveTeleOp((float) strafeError * (float) Constants.strafe_kP, 0.0f, 0.0f); 
                         //(float) ((lastHeading - getYaw()) * (float) Constants.turn_kP)); // drive there proportionally to how far away we are, and straight
             telemetry.addData("Strafe Error", strafeError);
@@ -234,7 +234,7 @@ public class DrivetrainSubsystem {
      */
     public boolean turnToHeading(float heading) {
         float error = lastHeading + heading - 180 - getYaw();
-        if (error < 0.1) { // if the error is less than our threshold
+        if (error > 0.1) { // if the error is less than our threshold
             arcadeDrive(0, error * Constants.turn_kP); // turn in-place, proportionally
             telemetry.addData("Turn Error", error);
             return false;

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
@@ -33,6 +34,10 @@ public class AtomicMotor {
     
     public int getCurrentPosition() {
         return motor.getCurrentPosition();
+    }
+    
+    public double getVelocity() {
+        return motor.getVelocity();
     }
     
     public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior b) {
