@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.exception.TargetPositionNotSetException;
 
-@TeleOp(name="AtomicTeleOp", group="Iterative Opmode")
+@TeleOp(name="AtomicTeleOp2", group="Iterative Opmode")
 public class AtomicTeleOp2 extends OpMode
 {
     // Declare OpMode members.
@@ -83,11 +83,19 @@ public class AtomicTeleOp2 extends OpMode
                 shooter.shoot(0);
             }*/
             
-            shooter.setTrigger(gamepad2.right_trigger);
+            shooter.setTrigger(gamepad2.right_trigger - gamepad2.left_trigger);
             if (gamepad2.a) {
                 shooter.warmUp(1);
             } else {
                 shooter.warmUp(0);
+            }
+            
+            if (gamepad2.left_bumper) {
+                shooter.setIntake(Constants.intakeUp);
+            } else if (gamepad2.right_bumper) {
+                shooter.setIntake(Constants.intakeDown);
+            } else if (gamepad2.b) {
+                shooter.setIntake(Constants.intakeNeutral);
             }
 
             telemetry.update();

@@ -24,6 +24,9 @@ public class GoodWobbleAuto extends LinearOpMode {
         wobble.setArm(Constants.wobbleServoDown);
         wobble.setClaw(Constants.wobbleClawClosed);
         waitForStart();
+        
+        shooter.setIntake(Constants.intakeNeutral);
+        wobble.setArm(Constants.wobbleServoUp);
     
         /** Drive to the rings */
         drivetrain.resetEncoders(); // prepare ourselves
@@ -38,11 +41,14 @@ public class GoodWobbleAuto extends LinearOpMode {
             inchesToDrive = 123 - 22; // -24 b/c we've already driven that much to get to the rings
         } else if (drivetrain.getRingCount() == 1) {
             // strafe?
+            drivetrain.postColorSensor();
             telemetry.addData("this works", "yes");
             telemetry.update();
+            
             inchesToDrive = 95 - 22;
         } else if (drivetrain.getRingCount() == 0) {
             inchesToDrive = 69 - 22;
+            
         }
         
         /** Strafe because otherwise we run directly into the stack */
@@ -79,7 +85,7 @@ public class GoodWobbleAuto extends LinearOpMode {
         if (inchesToDrive > 82) {
             inchesToDrive = -36; // the answer to Life, the Universe, and Everything
         } else if (inchesToDrive == 95 - 22) {
-            inchesToDrive = -26;
+            inchesToDrive = -23;
         } else {
             inchesToDrive = -1; // we should be close
         }

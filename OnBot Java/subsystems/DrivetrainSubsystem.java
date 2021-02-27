@@ -98,7 +98,7 @@ public class DrivetrainSubsystem {
     
     public boolean getOtherDistanceSensor() {
         NormalizedRGBA colors = otherColorSensor.getNormalizedColors();
-        return colors.red > 0.01 && colors.green > 0.01;
+        return colors.red > 0.018 && colors.green > 0.014;
     }
     
     public double getRingCount() {
