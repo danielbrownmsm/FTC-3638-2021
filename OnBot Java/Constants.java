@@ -18,7 +18,8 @@ public class Constants {
   public static final double wobbleClawOpen = 0.9;
   public static final double wobbleClawClosed = 0.55;
   
-  public static final double intakeUp = 0.9;
+  public static final double intakeUp = 0.3;
   public static final double intakeDown = 0;
-  public static final double intakeNeutral = 0.5;
+  public static final double intakeNeutral = 0.6;
+  public static final double intakeAuto = 0.7;
 }
