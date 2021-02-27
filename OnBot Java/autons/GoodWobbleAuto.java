@@ -34,10 +34,15 @@ public class GoodWobbleAuto extends LinearOpMode {
         }
         
         sleep(1000); // wait a bit to get a steady reading
-        if (drivetrain.getDistanceSensor() < 20) { // NaN not equal to itself
+        if (drivetrain.getRingCount() == 4) { // NaN not equal to itself
             inchesToDrive = 123 - 22; // -24 b/c we've already driven that much to get to the rings
-        } else {
-            inchesToDrive = 74 - 22;
+        } else if (drivetrain.getRingCount() == 1) {
+            // strafe?
+            telemetry.addData("this works", "yes");
+            telemetry.update();
+            inchesToDrive = 95 - 22;
+        } else if (drivetrain.getRingCount() == 0) {
+            inchesToDrive = 69 - 22;
         }
         
         /** Strafe because otherwise we run directly into the stack */
@@ -54,6 +59,15 @@ public class GoodWobbleAuto extends LinearOpMode {
             telemetry.update();
         }
         
+        if (inchesToDrive == 95 - 22) {
+            /** Strafe to reach the middle zone b/c it's far left */
+            drivetrain.resetEncoders(); // prepare ourselves
+            drivetrain.setHeading(); // to drive
+            while (!drivetrain.strafeDistance(35 + Constants.driftDistance)) {
+                telemetry.update();
+            }
+        }
+        
         /** Drop the wobble goal */
         wobble.setArm(Constants.wobbleServoLeft); // move the arm back over
         sleep(3000); // wait a sec for the servo
@@ -64,6 +78,8 @@ public class GoodWobbleAuto extends LinearOpMode {
         
         if (inchesToDrive > 82) {
             inchesToDrive = -36; // the answer to Life, the Universe, and Everything
+        } else if (inchesToDrive == 95 - 22) {
+            inchesToDrive = -26;
         } else {
             inchesToDrive = -1; // we should be close
         }

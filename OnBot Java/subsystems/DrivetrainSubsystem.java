@@ -30,6 +30,7 @@ public class DrivetrainSubsystem {
     private float lastHeading = 0;
     
     private NormalizedColorSensor colorSensor;
+    private NormalizedColorSensor otherColorSensor;
 
     private Telemetry telemetry;
 
@@ -78,10 +79,13 @@ public class DrivetrainSubsystem {
         
         colorSensor = map.get(NormalizedColorSensor.class, "rev_color_sensor");
         colorSensor.setGain(4);
+        
+        otherColorSensor = map.get(NormalizedColorSensor.class, "other_color");
+        otherColorSensor.setGain(4);
     }
     
     public void postColorSensor() {
-        NormalizedRGBA colors = colorSensor.getNormalizedColors();
+        NormalizedRGBA colors = otherColorSensor.getNormalizedColors();
         telemetry.addData("Red", colors.red);
         telemetry.addData("Green", colors.green);
         telemetry.addData("Blue", colors.blue);
@@ -90,6 +94,20 @@ public class DrivetrainSubsystem {
   
     public double getDistanceSensor() {
         return ((DistanceSensor) colorSensor).getDistance(DistanceUnit.INCH);
+    }
+    
+    public boolean getOtherDistanceSensor() {
+        NormalizedRGBA colors = otherColorSensor.getNormalizedColors();
+        return colors.red > 0.01 && colors.green > 0.01;
+    }
+    
+    public double getRingCount() {
+        if (getDistanceSensor() < 20) {
+            return 4;
+        } else if (getOtherDistanceSensor()) {
+            return 1;
+        }
+        return 0;
     }
   
     /**
