@@ -74,6 +74,14 @@ public class AtomicTeleOp extends OpMode
             } else if (gamepad1.y) {
                 wobble.setClaw(Constants.wobbleClawOpen);
             }
+            
+            if (gamepad1.b) {
+                shooter.setIntake(Constants.intakeUp);
+            } else if (gamepad1.right_bumper) {
+                shooter.setIntake(Constants.intakeDown);
+            } else if (gamepad1.left_bumper) {
+                shooter.setIntake(Constants.intakeNeutral);
+            }
 
             /*if (gamepad2.left_bumper) {
                 shooter.warmUp(1);

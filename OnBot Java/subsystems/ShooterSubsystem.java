@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class ShooterSubsystem {
     private CRServoImplEx trigger;
+    private ServoImplEx intake;
     private AtomicMotor shooter;
 
     private Telemetry telemetry;
@@ -26,6 +28,8 @@ public class ShooterSubsystem {
         trigger = map.get(CRServoImplEx.class, "trigger");
         trigger.setPower(0);
         trigger.setDirection(DcMotorSimple.Direction.REVERSE);
+        
+        intake = map.get(ServoImplEx.class, "intake");
     }
 
     public void warmUp(double power) {
@@ -40,6 +44,10 @@ public class ShooterSubsystem {
     
     public void setTrigger(double power) {
         trigger.setPower(power);
+    }
+    
+    public void setIntake(double pos) {
+        intake.setPosition(pos);
     }
 
 } 
