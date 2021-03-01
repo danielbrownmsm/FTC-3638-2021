@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import org.firstinspires.ftc.robotcore.external.Const;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -197,7 +198,7 @@ public class DrivetrainSubsystem {
         if (Math.abs(getInches(getEncoderAverage())) < Math.abs(inches)) { // if we haven't reached where we need to go
             arcadeDrive((inches - getInches(getEncoderAverage())) * -Constants.drive_kP, 
                         (lastHeading - getYaw()) * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
-            telemetry.addData("distance error", inches - getInches(getEncoderAverage()));
+            telemetry.addData("distance error", inches - getInches(getEncoderAverage()) * -Constants.drive_kP);
             return false; // we haven't reached it yet
         } else {
             arcadeDrive(0, 0);
@@ -231,15 +232,19 @@ public class DrivetrainSubsystem {
         telemetry.addData("heading", tempHeading);
         return tempHeading;
     }
+    
+    public float getLastSetHeading() {
+        return lastHeading;
+    }
   
     /**
      * Turns to a heading, in place. Make sure to call setHeading() before this
      * @param heading the heading you want to turn to, relative to the robot
      */
     public boolean turnToHeading(float heading) {
-        if (lastHeading + heading - 180 - getYaw() < 0.1) { // if the error is less than our threshold
-            arcadeDrive(0, (lastHeading + heading - 180 - getYaw()) * Constants.turn_kP); // turn in-place, proportionally
-            telemetry.addData("reading", lastHeading + heading - 180 - getYaw());
+        if (lastHeading + heading - getYaw() < 2) { // if the error is less than our threshold
+            arcadeDrive(0, (lastHeading + heading - getYaw()) * Constants.turn_turn_kP); // turn in-place, proportionally
+            telemetry.addData("reading", lastHeading + heading - getYaw());
             return false;
         } else {
             arcadeDrive(0, 0);  

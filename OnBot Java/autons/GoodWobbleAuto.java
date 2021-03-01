@@ -36,6 +36,11 @@ public class GoodWobbleAuto extends LinearOpMode {
             telemetry.update();
         }
         
+        while(!drivetrain.turnToHeading(drivetrain.getLastSetHeading())) {
+            drivetrain.postColorSensor();
+            telemetry.update();
+        }
+        
         sleep(1000); // wait a bit to get a steady reading
         if (drivetrain.getRingCount() == 4) { // NaN not equal to itself
             inchesToDrive = 123 - 22; // -24 b/c we've already driven that much to get to the rings
@@ -76,7 +81,7 @@ public class GoodWobbleAuto extends LinearOpMode {
         
         /** Drop the wobble goal */
         wobble.setArm(Constants.wobbleServoLeft); // move the arm back over
-        sleep(3000); // wait a sec for the servo
+        sleep(2000); // wait a sec for the servo
         wobble.setClaw(Constants.wobbleClawOpen); // open seasame
         sleep(1000); // same thing
         wobble.setArm(Constants.wobbleServoUp); // move the arm out of the way
