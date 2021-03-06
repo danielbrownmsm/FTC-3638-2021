@@ -90,7 +90,7 @@ public class DrivetrainSubsystem {
         telemetry.addData("Red", colors.red);
         telemetry.addData("Green", colors.green);
         telemetry.addData("Blue", colors.blue);
-        telemetry.addData("Distance", ((DistanceSensor) colorSensor).getDistance(DistanceUnit.INCH));
+        telemetry.addData("Distance", ((DistanceSensor) otherColorSensor).getDistance(DistanceUnit.INCH));
     }
   
     public double getDistanceSensor() {
@@ -98,8 +98,8 @@ public class DrivetrainSubsystem {
     }
     
     public boolean getOtherDistanceSensor() {
-        NormalizedRGBA colors = otherColorSensor.getNormalizedColors();
-        return colors.red > 0.018 && colors.green > 0.014;
+        return ((DistanceSensor) otherColorSensor).getDistance(DistanceUnit.INCH) < 15;
+        //return ((DistanceSensor) colorSensor).getDistance(DistanceUnit.INCH);
     }
     
     public double getRingCount() {
@@ -242,7 +242,7 @@ public class DrivetrainSubsystem {
      * @param heading the heading you want to turn to, relative to the robot
      */
     public boolean turnToHeading(float heading) {
-        if (lastHeading + heading - getYaw() < 2) { // if the error is less than our threshold
+        if (lastHeading + heading - getYaw() < 3) { // if the error is less than our threshold
             arcadeDrive(0, (lastHeading + heading - getYaw()) * Constants.turn_turn_kP); // turn in-place, proportionally
             telemetry.addData("reading", lastHeading + heading - getYaw());
             return false;
@@ -268,5 +268,12 @@ public class DrivetrainSubsystem {
     public void postImuStatus() {
         telemetry.addData("IMU calibrated: ", isGyroCalibrated());
         telemetry.update();
+    }
+    
+    public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior b) {
+        leftFront.setZeroPowerBehavior(b);
+        rightFront.setZeroPowerBehavior(b);
+        leftBack.setZeroPowerBehavior(b);
+        rightBack.setZeroPowerBehavior(b);
     }
 }

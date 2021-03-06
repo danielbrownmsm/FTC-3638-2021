@@ -11,6 +11,7 @@ public class GoodWobbleAuto extends LinearOpMode {
     private WobbleSubsystem wobble = new WobbleSubsystem(telemetry);
     private ShooterSubsystem shooter = new ShooterSubsystem(telemetry);
     private double inchesToDrive = 0;
+    private double path = -1;
   
     /**
      * This function is executed when this Op Mode is selected from the Driver Station.
@@ -21,11 +22,12 @@ public class GoodWobbleAuto extends LinearOpMode {
         wobble.init(hardwareMap);
         shooter.init(hardwareMap);
 
-        wobble.setArm(Constants.wobbleServoDown);
+        wobble.setArm(Constants.wobbleServoRight);
         wobble.setClaw(Constants.wobbleClawClosed);
+        shooter.setIntake(Constants.intakeAuto);
         waitForStart();
         
-        shooter.setIntake(Constants.intakeNeutral);
+        shooter.setIntake(Constants.intakeAuto);
         wobble.setArm(Constants.wobbleServoUp);
     
         /** Drive to the rings */
@@ -36,6 +38,7 @@ public class GoodWobbleAuto extends LinearOpMode {
             telemetry.update();
         }
         
+        // turn to make sure we are lined up
         while(!drivetrain.turnToHeading(drivetrain.getLastSetHeading())) {
             drivetrain.postColorSensor();
             telemetry.update();
@@ -44,16 +47,18 @@ public class GoodWobbleAuto extends LinearOpMode {
         sleep(1000); // wait a bit to get a steady reading
         if (drivetrain.getRingCount() == 4) { // NaN not equal to itself
             inchesToDrive = 123 - 22; // -24 b/c we've already driven that much to get to the rings
+            path = 3;
         } else if (drivetrain.getRingCount() == 1) {
             // strafe?
             drivetrain.postColorSensor();
             telemetry.addData("this works", "yes");
             telemetry.update();
             
-            inchesToDrive = 95 - 22;
+            inchesToDrive = 87 - 22;
+            path = 2;
         } else if (drivetrain.getRingCount() == 0) {
             inchesToDrive = 69 - 22;
-            
+            path = 1;
         }
         
         /** Strafe because otherwise we run directly into the stack */
@@ -70,7 +75,7 @@ public class GoodWobbleAuto extends LinearOpMode {
             telemetry.update();
         }
         
-        if (inchesToDrive == 95 - 22) {
+        if (path == 2) {
             /** Strafe to reach the middle zone b/c it's far left */
             drivetrain.resetEncoders(); // prepare ourselves
             drivetrain.setHeading(); // to drive
@@ -87,9 +92,9 @@ public class GoodWobbleAuto extends LinearOpMode {
         wobble.setArm(Constants.wobbleServoUp); // move the arm out of the way
         sleep(1000); // same thing
         
-        if (inchesToDrive > 82) {
-            inchesToDrive = -36; // the answer to Life, the Universe, and Everything
-        } else if (inchesToDrive == 95 - 22) {
+        if (path == 3) {
+            inchesToDrive = -36;
+        } else if (path == 2) {
             inchesToDrive = -23;
         } else {
             inchesToDrive = -1; // we should be close
