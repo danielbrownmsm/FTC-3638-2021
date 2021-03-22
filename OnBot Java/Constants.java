@@ -23,7 +23,7 @@ public class Constants {
   public static final double intakeUp = 0;
   public static final double intakeDown = 0.7;
   public static final double intakeNeutral = 0.2;
-  public static final double intakeAuto = 0.1;
+  public static final double intakeAuto = 0.05;
   
   public static final double targetRPM = 1100;
 }

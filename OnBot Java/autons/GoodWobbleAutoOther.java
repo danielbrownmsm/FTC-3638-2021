@@ -5,8 +5,8 @@ import org.firstinspires.ftc.robotcore.external.Const;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name = "GoodWobbleAuto Blue", group = "", preselectTeleOp = "AtomicTeleOp2")
-public class GoodWobbleAuto extends LinearOpMode {
+@Autonomous(name = "GoodWobbleAuto Red", group = "", preselectTeleOp = "AtomicTeleOp2")
+public class GoodWobbleAutoOther extends LinearOpMode {
     private DrivetrainSubsystem drivetrain = new DrivetrainSubsystem(telemetry);
     private WobbleSubsystem wobble = new WobbleSubsystem(telemetry);
     private ShooterSubsystem shooter = new ShooterSubsystem(telemetry);
@@ -55,7 +55,7 @@ public class GoodWobbleAuto extends LinearOpMode {
             inchesToDrive = 87 - 22;
             path = 2;
         } else if (drivetrain.getRingCount() == 0) {
-            inchesToDrive = 69 - 22;
+            inchesToDrive = 75 - 22;
             path = 1;
         }
         
@@ -71,7 +71,7 @@ public class GoodWobbleAuto extends LinearOpMode {
         
         /** Drive to the target zone */
         drivetrain.resetEncoders(); // prepare ourselves
-        while(!drivetrain.driveDistance(inchesToDrive - Constants.driftDistance)) { // does the actual driving
+        while(!drivetrain.driveDistance(inchesToDrive - Constants.driftDistance)) {
             drivetrain.addTelemetry();
             wobble.addTelemetry();
             shooter.addTelemetry();
@@ -79,10 +79,29 @@ public class GoodWobbleAuto extends LinearOpMode {
             telemetry.update();
         }
         
-        if (path == 2) {
-            /** Strafe to reach the middle zone b/c it's far left */
+        if (path == 1) {
+            // turn so wobble goal mech is on correct side
+            while(!drivetrain.turnToHeading(178)) {
+                drivetrain.addTelemetry();
+                wobble.addTelemetry();
+                shooter.addTelemetry();
+            
+                telemetry.update();
+            }
+            
+            // strafe right (but actually left b/c we turned)
             drivetrain.resetEncoders(); // prepare ourselves
-            while (!drivetrain.strafeDistance(32 + Constants.driftDistance)) {
+            while (!drivetrain.strafeDistance(-30 + Constants.driftDistance)) {
+                drivetrain.addTelemetry();
+                wobble.addTelemetry();
+                shooter.addTelemetry();
+            
+                telemetry.update();
+            }
+        } else if (path == 2) {
+            //strafe a bit to make sure we're completely in
+            drivetrain.resetEncoders(); // prepare ourselves
+            while (!drivetrain.strafeDistance(35 + Constants.driftDistance)) {
                 drivetrain.addTelemetry();
                 wobble.addTelemetry();
                 shooter.addTelemetry();
@@ -90,9 +109,18 @@ public class GoodWobbleAuto extends LinearOpMode {
                 telemetry.update();
             }
         } else if (path == 3) {
-            /** Strafe to reach the middle zone b/c it's far left */
+            // turn
+            while(!drivetrain.turnToHeading(175)) {
+                drivetrain.addTelemetry();
+                wobble.addTelemetry();
+                shooter.addTelemetry();
+            
+                telemetry.update();
+            }
+            
+            // strafe
             drivetrain.resetEncoders(); // prepare ourselves
-            while (!drivetrain.strafeDistance(15 + Constants.driftDistance)) {
+            while (!drivetrain.strafeDistance(-37 + Constants.driftDistance)) {
                 drivetrain.addTelemetry();
                 wobble.addTelemetry();
                 shooter.addTelemetry();
@@ -110,24 +138,36 @@ public class GoodWobbleAuto extends LinearOpMode {
         sleep(1000); // same thing
         
         if (path == 3) {
-            inchesToDrive = -45;
-        } else if (path == 2) {
-            inchesToDrive = -23;
-             /** Strafe to reach the middle zone b/c it's far left */
+            /** Strafe so we're not touching wobble goal */
             drivetrain.resetEncoders(); // prepare ourselves
             while (!drivetrain.strafeDistance(4 + Constants.driftDistance)) {
                 drivetrain.addTelemetry();
                 wobble.addTelemetry();
                 shooter.addTelemetry();
-            
+                
                 telemetry.update();
             }
+            
+            inchesToDrive = 42;
+        } else if (path == 2) {
+            /** Strafe so we're not touching wobble goal */
+            drivetrain.resetEncoders(); // prepare ourselves
+            while (!drivetrain.strafeDistance(4 + Constants.driftDistance)) {
+                drivetrain.addTelemetry();
+                wobble.addTelemetry();
+                shooter.addTelemetry();
+                
+                telemetry.update();
+            }
+            
+            inchesToDrive = -18;
         } else {
-            inchesToDrive = -1; // we should be close
+            inchesToDrive = 1; // we should be close
         }
         
         /** Drive to the target zone */
         drivetrain.resetEncoders(); // prepare ourselves
+        drivetrain.setHeading(); // to drive
         while(!drivetrain.driveDistance(inchesToDrive - Constants.driftDistance)) { // does the actual driving
             drivetrain.addTelemetry();
             wobble.addTelemetry();
@@ -139,7 +179,7 @@ public class GoodWobbleAuto extends LinearOpMode {
         
         /** Strafe so we're not touching wobble goal */
         drivetrain.resetEncoders(); // prepare ourselves
-        while (!drivetrain.strafeDistance(10 + Constants.driftDistance)) {
+        while (!drivetrain.strafeDistance(7 + Constants.driftDistance)) {
             drivetrain.addTelemetry();
             wobble.addTelemetry();
             shooter.addTelemetry();

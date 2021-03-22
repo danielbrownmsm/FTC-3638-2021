@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.SwitchableLight;
 import org.firstinspires.ftc.robotcore.external.Const;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -34,6 +35,7 @@ public class DrivetrainSubsystem {
     private NormalizedColorSensor otherColorSensor;
 
     private Telemetry telemetry;
+    boolean willStopTurning = false;
 
     public DrivetrainSubsystem(Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -66,7 +68,7 @@ public class DrivetrainSubsystem {
         imuParameters = new BNO055IMU.Parameters();
         imuParameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        imuParameters.calibrationDataFile = "AdafruitIMUCalibration.json";
+        imuParameters.calibrationDataFile = "imu1_calib.json";
         imuParameters.mode = BNO055IMU.SensorMode.IMU;
         imuParameters.temperatureUnit = BNO055IMU.TempUnit.FARENHEIT;
         imuParameters.accelerationIntegrationAlgorithm = null;
@@ -76,6 +78,7 @@ public class DrivetrainSubsystem {
         imu1.initialize(imuParameters); // initialize the imu
   
         imu2 = map.get(BNO055IMU.class, "imu 2");
+        imuParameters.calibrationDataFile = "imu2_calib.json";
         imu2.initialize(imuParameters); // initialize the imu
         
         colorSensor = map.get(NormalizedColorSensor.class, "rev_color_sensor");
@@ -85,27 +88,23 @@ public class DrivetrainSubsystem {
         otherColorSensor.setGain(4);
     }
     
-    public void postColorSensor() {
-        NormalizedRGBA colors = otherColorSensor.getNormalizedColors();
-        telemetry.addData("Red", colors.red);
-        telemetry.addData("Green", colors.green);
-        telemetry.addData("Blue", colors.blue);
-        telemetry.addData("Distance", ((DistanceSensor) otherColorSensor).getDistance(DistanceUnit.INCH));
-    }
-  
-    public double getDistanceSensor() {
-        return ((DistanceSensor) colorSensor).getDistance(DistanceUnit.INCH);
+    public void addTelemetry() {
+        telemetry.addData("Distance", getInches(getEncoderAverage()));
+        telemetry.addData("Heading1", getYaw());
+        telemetry.addData("Heading2", getOtherYaw());
+        telemetry.addData("Ring Count", getRingCount());
+        //telemetry.addData("==============");
     }
     
-    public boolean getOtherDistanceSensor() {
-        return ((DistanceSensor) otherColorSensor).getDistance(DistanceUnit.INCH) < 15;
-        //return ((DistanceSensor) colorSensor).getDistance(DistanceUnit.INCH);
-    }
-    
+    /**
+     * Gets the number of rings according to our distance sensors
+     * 
+     * @return the number of rings
+     */
     public double getRingCount() {
-        if (getDistanceSensor() < 20) {
+        if (((DistanceSensor) colorSensor).getDistance(DistanceUnit.INCH) < 20) {
             return 4;
-        } else if (getOtherDistanceSensor()) {
+        } else if (((DistanceSensor) otherColorSensor).getDistance(DistanceUnit.INCH) < 25) {
             return 1;
         }
         return 0;
@@ -115,6 +114,7 @@ public class DrivetrainSubsystem {
      * Gets if the imu is calibrated and ready-to-use or not
      * @return whether the IMU is calibrated or not
      */
+     @Deprecated
     public Boolean isGyroCalibrated() {
         return imu1.isSystemCalibrated() && imu2.isSystemCalibrated();
     }
@@ -183,21 +183,23 @@ public class DrivetrainSubsystem {
     }
   
     /**
-     * Sets the last taken heading so we can drive straight in driveDistance
+     * Sets the last taken heading so we can drive straight in driveDistance and strafeDistance
+     * @see driveDistance(), strafeDistance()
      */
     public void setHeading() {
         lastHeading = getYaw();
     }
   
     /**
-     * Drives the robot on the last taken heading (so, straight) the distance given in inches
+     * Drives the robot on the last taken heading (so, straight) the distance given in inches, proportionally
      * @param inches how far you want to drive, in inches
+     * 
      * @return if we have reached that distance or not
      */
     public boolean driveDistance(double inches) {
         if (Math.abs(getInches(getEncoderAverage())) < Math.abs(inches)) { // if we haven't reached where we need to go
-            arcadeDrive((inches - getInches(getEncoderAverage())) * -Constants.drive_kP, 
-                        (lastHeading - getYaw()) * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
+            arcadeDrive((inches - getInches(getEncoderAverage())) * -Constants.drive_kP, 0);
+                        //(lastHeading - getYaw()) * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
             telemetry.addData("distance error", inches - getInches(getEncoderAverage()) * -Constants.drive_kP);
             return false; // we haven't reached it yet
         } else {
@@ -227,28 +229,91 @@ public class DrivetrainSubsystem {
      * Gets the current gyro yaw angle (so, turning stuff)
      * @return the yaw of the gyro
      */
+    @Deprecated
     public float getYaw() { 
         float tempHeading = imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).thirdAngle;
-        telemetry.addData("heading", tempHeading);
-        return tempHeading;
+        return tempHeading; // 3 b/c freaking won't zero or something
     }
     
-    public float getLastSetHeading() {
-        return lastHeading;
+    /**
+     * Gets the current average of the gyro yaw angles (so, turning stuff)
+     * @return the yaw of the gyros
+     */
+     @Deprecated
+    public float getOtherYaw() { 
+        float tempHeading = imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).thirdAngle;
+        //float otherTempHeading = imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).thirdAngle;
+        //return (tempHeading + otherTempHeading) / 2; // average
+        return tempHeading;
     }
   
     /**
      * Turns to a heading, in place. Make sure to call setHeading() before this
      * @param heading the heading you want to turn to, relative to the robot
      */
-    public boolean turnToHeading(float heading) {
+    /*public boolean turnToHeading(float heading) {
         if (lastHeading + heading - getYaw() < 3) { // if the error is less than our threshold
             arcadeDrive(0, (lastHeading + heading - getYaw()) * Constants.turn_turn_kP); // turn in-place, proportionally
             telemetry.addData("reading", lastHeading + heading - getYaw());
             return false;
         } else {
-            arcadeDrive(0, 0);  
-            return true; // we have reached that heading
+            //arcadeDrive(0, 0);  
+            //return true; // we have reached that heading
+            return false;
+        }
+    }*/
+    
+    /*public boolean turnToHeading(float heading) {
+        dataHeading = heading;
+        if (Math.abs(lastHeading + heading - getYaw()) < 3) { // if the error is less than our threshold
+            arcadeDrive(0, (lastHeading + heading - getYaw()) * Constants.turn_turn_kP); // turn in-place, proportionally
+            telemetry.addData("reading", lastHeading + heading - getYaw());
+            telemetry.update();
+            return false;
+        } else {
+            //arcadeDrive(0, 0);  
+            //return true; // we have reached that heading
+            return false;
+        }
+    }*/
+    
+    public boolean turnToHeading(float heading) {
+        // goal + last = 183
+        // > 180 so -180 = 3
+        // then 180 - that * -1
+        float tempGoal = heading + lastHeading;
+        if (tempGoal < -180) {
+            tempGoal += 180;
+            tempGoal = 180 - tempGoal;
+            tempGoal *= -1;
+        } else if (tempGoal > 180) {
+            tempGoal -= 180;
+            tempGoal = 180 - tempGoal;
+            tempGoal *= -1;
+        }
+        
+        telemetry.addData("last heading", lastHeading);
+        telemetry.addData("heading", heading);
+        telemetry.addData("temp goal", tempGoal);
+        
+        if (Math.abs(tempGoal - getYaw()) < 2) {
+            if (willStopTurning) {
+                return true;
+            }
+            willStopTurning = true;
+            return false;
+        } else if (tempGoal < getYaw()) {
+            arcadeDrive(0, -0.1);
+            willStopTurning = false;
+
+            return false;
+        } else if (tempGoal > getYaw()) {
+            arcadeDrive(0, 0.1);
+            willStopTurning = false;
+
+            return false;
+        } else {
+            return true; // how the h*** did we get here?
         }
     }
   
@@ -264,12 +329,11 @@ public class DrivetrainSubsystem {
         leftBack.setPower(leftStickY + leftStickX - rightStickX);
         rightBack.setPower(leftStickY - leftStickX + rightStickX);
     }
-
-    public void postImuStatus() {
-        telemetry.addData("IMU calibrated: ", isGyroCalibrated());
-        telemetry.update();
-    }
     
+    /**
+     * Sets the zeroPowerBehavior of all the drivetrain motors
+     * @param b the DcMotor.ZeroPowerBehavior you want all the motors set to
+     */
     public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior b) {
         leftFront.setZeroPowerBehavior(b);
         rightFront.setZeroPowerBehavior(b);

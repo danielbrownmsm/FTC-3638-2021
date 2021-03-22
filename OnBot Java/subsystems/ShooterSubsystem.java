@@ -47,7 +47,7 @@ public class ShooterSubsystem {
     public void shoot(double power) {
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         shooter.setPower(power);
-        trigger.setPower(power);
+        //trigger.setPower(power);
     }
     
     public void setTrigger(double power) {
@@ -78,7 +78,13 @@ public class ShooterSubsystem {
     }
     
     public boolean isShooterGood() {
-        return Math.abs(Constants.targetRPM - lastVelocity) < 10; // we want to be within 10 RPM of the setpoint
+        return Math.abs(Constants.targetRPM - lastVelocity) < 100; // we want to be within 100 RPM of the setpoint
     }
-
-} 
+    
+    public void addTelemetry() {
+        telemetry.addData("Shooter good", isShooterGood());
+        telemetry.addData("Velocity", lastVelocity / 134.4 * -60);
+        telemetry.addData("Intake Position", intake.getPosition());
+        //telemetry.addData("==============");
+    }
+}

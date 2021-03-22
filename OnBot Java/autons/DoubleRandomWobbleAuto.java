@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import org.firstinspires.ftc.robotcore.external.Const;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name = "DoubleRandomWobbleAuto", group = "")
+@Autonomous(name = "DoubleRandomWobbleAuto", group = "other")
+@Disabled
 public class DoubleRandomWobbleAuto extends LinearOpMode {
     private DrivetrainSubsystem drivetrain = new DrivetrainSubsystem(telemetry);
     private WobbleSubsystem wobble = new WobbleSubsystem(telemetry);

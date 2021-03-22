@@ -11,8 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.exception.TargetPositionNotSetException;
 
 @TeleOp(name="AtomicTeleOp", group="Iterative Opmode")
-public class AtomicTeleOp extends OpMode
-{
+public class AtomicTeleOp extends OpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
@@ -42,7 +41,11 @@ public class AtomicTeleOp extends OpMode
      */
     @Override
     public void init_loop() {
-        drivetrain.postImuStatus();
+        drivetrain.addTelemetry();
+        shooter.addTelemetry();
+        wobble.addTelemetry();
+        
+        telemetry.update();
     }
 
     /*
@@ -60,30 +63,21 @@ public class AtomicTeleOp extends OpMode
     @Override
     public void loop() {
         try {
-            // driving (square inputs)
-            //float tempLeftStickX = Math.copySign(gamepad1.left_stick_x * gamepad1.left_stick_x, gamepad1.left_stick_x);
-            //float tempLeftStickY = Math.copySign(gamepad1.left_stick_y * gamepad1.left_stick_y, gamepad1.left_stick_y);
-            //float tempRightStickX = Math.copySign(gamepad1.right_stick_x * gamepad1.right_stick_x, gamepad1.right_stick_x);
-            //drivetrain.driveTeleOp(tempLeftStickX, tempLeftStickY, tempRightStickX);
-            if (halfSpeed) { // if the stick is pressed down
+            //if (!halfSpeed) {
                 drivetrain.driveTeleOp(gamepad1.left_stick_x * direction, gamepad1.left_stick_y * direction, gamepad1.right_stick_x); // normal inputs
-            } else { // halve the inputs
-                drivetrain.driveTeleOp(gamepad1.left_stick_x * direction / 2, gamepad1.left_stick_y  * direction / 2, gamepad1.right_stick_x / 2);
-            }
+            //} else { // halve the inputs
+            //    drivetrain.driveTeleOp(gamepad1.left_stick_x * direction / 2, gamepad1.left_stick_y  * direction / 2, gamepad1.right_stick_x / 2);
+            //}
             
+            // reverse-direction stuff
+            /*
             if (gamepad1.back && !wasToggled) {
                 direction *= -1;
                 wasToggled = true;
             } else if (!gamepad1.back) {
                 wasToggled = false;
             }
-
-            if ((gamepad1.left_stick_button || gamepad1.right_stick_button) && !wasHalfSpeedToggled) {
-                wasHalfSpeedToggled = true;
-                halfSpeed = !halfSpeed;
-            } else if (!gamepad1.left_stick_button || !gamepad1.right_stick_button) {
-                wasHalfSpeedToggled = false;
-            }
+            */
 
             // wobble goal arm
             if (gamepad1.dpad_up) {
@@ -92,8 +86,6 @@ public class AtomicTeleOp extends OpMode
                 wobble.setArm(Constants.wobbleServoLeft);
             } else if (gamepad1.dpad_right) {
                 wobble.setArm(Constants.wobbleServoRight);
-            } else if (gamepad1.dpad_down) {
-                wobble.setArm(Constants.wobbleServoDown);
             }
 
             // wobble goal claw
@@ -103,6 +95,7 @@ public class AtomicTeleOp extends OpMode
                 wobble.setClaw(Constants.wobbleClawOpen);
             }
             
+            // intake stuff
             if (gamepad1.b) {
                 shooter.setIntake(Constants.intakeNeutral); // net is 0.2
             } else if (gamepad1.right_bumper) {
@@ -111,33 +104,45 @@ public class AtomicTeleOp extends OpMode
                 shooter.setIntake(Constants.intakeUp); // up is 0
             }
 
-            /*if (gamepad2.left_bumper) {
-                shooter.warmUp(1);
-            } else if (gamepad2.right_bumper) {
-                shooter.shoot(1);
-            } else if (gamepad2.b) {
-                shooter.shoot(0);
-            }*/
-            
+            // shooter stuff
             if (gamepad1.a) {
                 shooter.shootPID(runtime.seconds());
             } else {
                 shooter.warmUp(0);
             }
+            
+            // move this to top b/c it's drivetrain stuff
+            if (gamepad1.start) {
+                drivetrain.resetEncoders();
+                drivetrain.setHeading();
+                while (!drivetrain.strafeDistance(-16) && !gamepad1.back) {
+                    drivetrain.addTelemetry();
+                    shooter.addTelemetry();
+                    wobble.addTelemetry();
+                    
+                    telemetry.update();
+                }
+                drivetrain.setHeading();
+                while (!drivetrain.turnToHeading(-30) && !gamepad1.back) {
+                    drivetrain.addTelemetry();
+                    shooter.addTelemetry();
+                    wobble.addTelemetry();
+                    
+                    telemetry.update();
+                }
+            }
 
-            //if (shooter.isShooterGood()) {
-                shooter.setTrigger(gamepad1.right_trigger - gamepad1.left_trigger);
-            //}
+            shooter.setTrigger(gamepad1.right_trigger - gamepad1.left_trigger);
 
-            telemetry.addData("Shooter Velocity: ", shooter.getVelocity(runtime.seconds()));
-            //telemetry.addData("Time", runtime.seconds());
+            drivetrain.addTelemetry();
+            shooter.addTelemetry();
+            wobble.addTelemetry();
+            telemetry.addData("Time", runtime.seconds());
+            
             telemetry.update();
 
         } catch (TargetPositionNotSetException targetPosError) {
             telemetry.addData("The target position error happened again", "");
-            telemetry.update();
-        } catch (Exception exception) {
-            telemetry.addData("Exception occured", exception.toString());
             telemetry.update();
         }
     }

@@ -41,6 +41,9 @@ public class WobbleSubsystem {
             wobbleArm.setPwmDisable();
         }
     }
-
-}
     
+    public void addTelemetry() {
+        telemetry.addData("Arm Position", wobbleArm.getPosition());
+        telemetry.addData("Claw Position", wobbleClaw.getPosition());
+    }
+}

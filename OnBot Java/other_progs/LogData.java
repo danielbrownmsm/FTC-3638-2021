@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="Log Data", group="Iterative Opmode")
+@TeleOp(name="Log Data", group="other")
+@Disabled
 public class LogData extends OpMode {
     private DrivetrainSubsystem drivetrain = new DrivetrainSubsystem(telemetry);
 
@@ -21,9 +23,7 @@ public class LogData extends OpMode {
      */
     @Override
     public void loop() {
-        telemetry.addData("heading", drivetrain.getYaw());
-        telemetry.addData("inches", drivetrain.getInches(drivetrain.getEncoderAverage()));
-        drivetrain.postColorSensor();
+        drivetrain.addTelemetry();
         telemetry.update();
         
         if (gamepad1.a) {
