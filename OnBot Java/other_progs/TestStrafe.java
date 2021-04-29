@@ -6,9 +6,9 @@ import org.firstinspires.ftc.robotcore.external.Const;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name = "GyroTurnTest", group = "other")
+@Autonomous(name = "Test the freaking strafe", group = "test")
 @Disabled
-public class GyroTurnTest extends LinearOpMode {
+public class TestStrafe extends LinearOpMode {
     private DrivetrainSubsystem drivetrain = new DrivetrainSubsystem(telemetry);
 
     /**
@@ -23,9 +23,8 @@ public class GyroTurnTest extends LinearOpMode {
         /** Strafe to pick up the other wobble goal */
         drivetrain.resetEncoders(); // prepare ourselves
         drivetrain.setHeading(); // to drive
-        while (!drivetrain.turnToHeading(90)) {
+        while (!drivetrain.strafeDistance(100 + Constants.driftDistance)) {
             telemetry.update();
         }
-        sleep(3000);
     }
 }

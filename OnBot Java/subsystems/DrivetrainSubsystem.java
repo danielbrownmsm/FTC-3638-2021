@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
-import org.firstinspires.ftc.robotcore.external.Const;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -36,9 +35,21 @@ public class DrivetrainSubsystem {
 
     private Telemetry telemetry;
     boolean willStopTurning = false;
+    
+    private PIDController distancePID = new PIDController(Constants.d_kP, Constants.d_kI, Constants.d_kD);
+    private PIDController strafePID = new PIDController(Constants.s_kP, Constants.s_kI, Constants.s_kD);
+    private PIDController headingPID = new PIDController(Constants.h_kP, Constants.h_kI, Constants.h_kD, -180, 180, true); // these two are continuous (max/min wrap around)
+    private PIDController turningPID = new PIDController(Constants.t_kP, Constants.t_kI, Constants.t_kD, -180, 180, true);
+
 
     public DrivetrainSubsystem(Telemetry telemetry) {
         this.telemetry = telemetry;
+        
+        // aparently you have to do this in here?
+        distancePID.setTolerance(0.1, 0.1);
+        strafePID.setTolerance(0.1, 0.5);
+        headingPID.setTolerance(1, 1);
+        turningPID.setTolerance(5, 5);
     }
   
     /**
@@ -197,14 +208,18 @@ public class DrivetrainSubsystem {
      * @return if we have reached that distance or not
      */
     public boolean driveDistance(double inches) {
-        if (Math.abs(getInches(getEncoderAverage())) < Math.abs(inches)) { // if we haven't reached where we need to go
-            arcadeDrive((inches - getInches(getEncoderAverage())) * -Constants.drive_kP, 0);
-                        //(lastHeading - getYaw()) * Constants.turn_kP); // drive there proportionally to how far away we are, and straight
-            telemetry.addData("distance error", inches - getInches(getEncoderAverage()) * -Constants.drive_kP);
-            return false; // we haven't reached it yet
-        } else {
+        inches = -inches;
+        distancePID.setSetpoint(inches);
+        if (distancePID.atSetpoint()) {
             arcadeDrive(0, 0);
-            return true; // we're here!
+            return true;
+        } else {
+            arcadeDrive(distancePID.calculate(getInches(getEncoderAverage()), System.currentTimeMillis()), headingPID.calculate((double) getYaw(), System.currentTimeMillis()));
+            telemetry.addData("output", distancePID.calculate(getInches(getEncoderAverage()), System.currentTimeMillis()));
+            telemetry.addData("setpoint", distancePID.getSetpoint());
+            telemetry.addData("error", distancePID.getError());
+            
+            return false;
         }
     }
   
@@ -214,14 +229,13 @@ public class DrivetrainSubsystem {
      * @return if we've reached the distance or not
      */
     public boolean strafeDistance(double inches) {
-        if (Math.abs(getInches(getStrafeEncoderAverage())) < Math.abs(inches)) { // if we haven't reached where we need to go
-            driveTeleOp((float) ((inches - getInches(getStrafeEncoderAverage())) * Constants.strafe_kP), 0.0f, 0.0f); 
-                        //(float) ((lastHeading - getYaw()) * (float) Constants.turn_kP)); // drive there proportionally to how far away we are, and straight
-            telemetry.addData("strafe error", inches - getInches(getStrafeEncoderAverage()));
-            return false; // we haven't reached it yet
-        } else {
+        strafePID.setSetpoint(inches);
+        if (strafePID.atSetpoint()) {
             arcadeDrive(0, 0);
-            return true; // we're here!
+            return true;
+        } else {
+            arcadeDrive(strafePID.calculate(getInches(getEncoderAverage()), System.currentTimeMillis()), headingPID.calculate((double) getYaw(), System.currentTimeMillis()));
+            return false;
         }
     }
   
@@ -231,8 +245,8 @@ public class DrivetrainSubsystem {
      */
     @Deprecated
     public float getYaw() { 
-        float tempHeading = imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES).thirdAngle;
-        return tempHeading; // 3 b/c freaking won't zero or something
+        float tempHeading = imu1.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+        return tempHeading;
     }
     
     /**
@@ -303,12 +317,12 @@ public class DrivetrainSubsystem {
             willStopTurning = true;
             return false;
         } else if (tempGoal < getYaw()) {
-            arcadeDrive(0, -0.1);
+            arcadeDrive(0, -0.2);
             willStopTurning = false;
 
             return false;
         } else if (tempGoal > getYaw()) {
-            arcadeDrive(0, 0.1);
+            arcadeDrive(0, 0.2);
             willStopTurning = false;
 
             return false;
@@ -316,6 +330,26 @@ public class DrivetrainSubsystem {
             return true; // how the h*** did we get here?
         }
     }
+    
+    /* For now only handles absolute turns, not relative (like turn to 90 degrees vs turn 30 degrees right where you're already at like 20 so you end up at 50 instead of 30) TODO XXX BUG FIXME */
+    /*public boolean turnToHeading(double heading) {
+        turningPID.setSetpoint(heading);
+        if (turningPID.atSetpoint()) {
+            arcadeDrive(0, 0);
+            return true;
+        } else {
+            arcadeDrive(0, turningPID.calculate((double) getYaw(), System.currentTimeMillis()));
+            telemetry.addData("output", turningPID.calculate(getInches(getEncoderAverage()), System.currentTimeMillis()));
+            telemetry.addData("setpoint", turningPID.getSetpoint());
+            telemetry.addData("error", turningPID.getError());
+            
+            //if (Math.abs(Math.abs(heading) - Math.abs(turningPID.getError())) < 1.5) { // lol idk if it works it works
+            // screw this
+            //    return true;
+            //}
+            return false;
+        }
+    }*/
   
     /**
      * Drives us in tele-op all mecanum-y
@@ -324,6 +358,16 @@ public class DrivetrainSubsystem {
      * @param rightStickX controls the turning
      */
     public void driveTeleOp(float leftStickX, float leftStickY, float rightStickX) {
+        if (Math.abs(leftStickX) < Constants.deadband) {
+            leftStickX = 0;
+        }
+        if (Math.abs(leftStickY) < Constants.deadband) {
+            leftStickY = 0;
+        }
+        if (Math.abs(rightStickX) < Constants.deadband) {
+            rightStickX = 0;
+        }
+        
         leftFront.setPower(leftStickY - leftStickX - rightStickX);
         rightFront.setPower(leftStickY + leftStickX + rightStickX);
         leftBack.setPower(leftStickY + leftStickX - rightStickX);

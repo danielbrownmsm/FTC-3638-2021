@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Autonomous(name = "DriveToLineAuto", group = "other")
 public class DriveToLineAutoBetter extends LinearOpMode {
@@ -27,10 +29,17 @@ public class DriveToLineAutoBetter extends LinearOpMode {
         
         drivetrain.resetEncoders(); // prepare ourselves
         drivetrain.setHeading(); // to drive
-        while(!drivetrain.driveDistance(69 - Constants.driftDistance)) { // this part up here drives
+        /*while(!drivetrain.driveDistance(69 - Constants.driftDistance) && opModeIsActive()) { // this part up here drives
+            drivetrain.addTelemetry();
+            telemetry.update();
+        }*/
+        //sleep(1000);
+        
+        while(!drivetrain.turnToHeading(180) && opModeIsActive()) {
             drivetrain.addTelemetry();
             telemetry.update();
         }
+        
         sleep(1000);
     }
 }

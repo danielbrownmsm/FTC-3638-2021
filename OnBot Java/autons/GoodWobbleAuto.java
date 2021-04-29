@@ -33,7 +33,7 @@ public class GoodWobbleAuto extends LinearOpMode {
         /** Drive to the rings */
         drivetrain.resetEncoders(); // prepare ourselves
         drivetrain.setHeading(); // to drive
-        while(!drivetrain.driveDistance(22 - Constants.driftDistance)) { // does the actual driving
+        while(!drivetrain.driveDistance(22 - Constants.driftDistance) && opModeIsActive()) { // does the actual driving
             drivetrain.addTelemetry();
             wobble.addTelemetry();
             shooter.addTelemetry();
@@ -61,7 +61,7 @@ public class GoodWobbleAuto extends LinearOpMode {
         
         /** Strafe because otherwise we run directly into the stack */
         drivetrain.resetEncoders(); // prepare ourselves
-        while (!drivetrain.strafeDistance(-11 + Constants.driftDistance)) {
+        while (!drivetrain.strafeDistance(-11 + Constants.driftDistance) && opModeIsActive()) {
             drivetrain.addTelemetry();
             wobble.addTelemetry();
             shooter.addTelemetry();
@@ -71,7 +71,7 @@ public class GoodWobbleAuto extends LinearOpMode {
         
         /** Drive to the target zone */
         drivetrain.resetEncoders(); // prepare ourselves
-        while(!drivetrain.driveDistance(inchesToDrive - Constants.driftDistance)) { // does the actual driving
+        while(!drivetrain.driveDistance(inchesToDrive - Constants.driftDistance) && opModeIsActive()) { // does the actual driving
             drivetrain.addTelemetry();
             wobble.addTelemetry();
             shooter.addTelemetry();
@@ -82,7 +82,7 @@ public class GoodWobbleAuto extends LinearOpMode {
         if (path == 2) {
             /** Strafe to reach the middle zone b/c it's far left */
             drivetrain.resetEncoders(); // prepare ourselves
-            while (!drivetrain.strafeDistance(32 + Constants.driftDistance)) {
+            while (!drivetrain.strafeDistance(32 + Constants.driftDistance) && opModeIsActive()) {
                 drivetrain.addTelemetry();
                 wobble.addTelemetry();
                 shooter.addTelemetry();
@@ -92,7 +92,7 @@ public class GoodWobbleAuto extends LinearOpMode {
         } else if (path == 3) {
             /** Strafe to reach the middle zone b/c it's far left */
             drivetrain.resetEncoders(); // prepare ourselves
-            while (!drivetrain.strafeDistance(15 + Constants.driftDistance)) {
+            while (!drivetrain.strafeDistance(15 + Constants.driftDistance) && opModeIsActive()) {
                 drivetrain.addTelemetry();
                 wobble.addTelemetry();
                 shooter.addTelemetry();
@@ -115,7 +115,7 @@ public class GoodWobbleAuto extends LinearOpMode {
             inchesToDrive = -23;
              /** Strafe to reach the middle zone b/c it's far left */
             drivetrain.resetEncoders(); // prepare ourselves
-            while (!drivetrain.strafeDistance(4 + Constants.driftDistance)) {
+            while (!drivetrain.strafeDistance(4 + Constants.driftDistance) && opModeIsActive()) {
                 drivetrain.addTelemetry();
                 wobble.addTelemetry();
                 shooter.addTelemetry();
@@ -128,7 +128,7 @@ public class GoodWobbleAuto extends LinearOpMode {
         
         /** Drive to the target zone */
         drivetrain.resetEncoders(); // prepare ourselves
-        while(!drivetrain.driveDistance(inchesToDrive - Constants.driftDistance)) { // does the actual driving
+        while(!drivetrain.driveDistance(inchesToDrive - Constants.driftDistance) && opModeIsActive()) { // does the actual driving
             drivetrain.addTelemetry();
             wobble.addTelemetry();
             shooter.addTelemetry();
@@ -139,7 +139,7 @@ public class GoodWobbleAuto extends LinearOpMode {
         
         /** Strafe so we're not touching wobble goal */
         drivetrain.resetEncoders(); // prepare ourselves
-        while (!drivetrain.strafeDistance(10 + Constants.driftDistance)) {
+        while (!drivetrain.strafeDistance(10 + Constants.driftDistance) && opModeIsActive()) {
             drivetrain.addTelemetry();
             wobble.addTelemetry();
             shooter.addTelemetry();

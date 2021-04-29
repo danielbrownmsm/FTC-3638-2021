@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Log Data", group="other")
-@Disabled
 public class LogData extends OpMode {
     private DrivetrainSubsystem drivetrain = new DrivetrainSubsystem(telemetry);
 

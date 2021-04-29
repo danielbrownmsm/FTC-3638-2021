@@ -30,7 +30,7 @@ public class ShooterSubsystem {
     public void init(HardwareMap map) {
         shooter = new AtomicMotor(map.get(DcMotorImplEx.class, "shooter"));
         shooter.init();
-        shooter.setDirection(DcMotorSimple.Direction.FORWARD);
+        shooter.setDirection(DcMotorSimple.Direction.REVERSE);
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         trigger = map.get(CRServoImplEx.class, "trigger");
@@ -70,11 +70,12 @@ public class ShooterSubsystem {
     }
     
     public void shootPID(double currTime) {
-        double power = (Constants.targetRPM - getVelocity(currTime)) * Constants.shoot_kP;
-        if (power < 0) {
-            power = 0;
-        }
-        shooter.setPower(power);
+        //double power = (Constants.targetRPM - getVelocity(currTime)) * Constants.shoot_kP;
+        //if (power < 0) {
+        //    power = 0;
+        //}
+        getVelocity(currTime);
+        shooter.setPower(1);
     }
     
     public boolean isShooterGood() {
@@ -87,4 +88,5 @@ public class ShooterSubsystem {
         telemetry.addData("Intake Position", intake.getPosition());
         //telemetry.addData("==============");
     }
-}
+
+} 

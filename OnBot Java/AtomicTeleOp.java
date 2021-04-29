@@ -137,6 +137,10 @@ public class AtomicTeleOp extends OpMode {
             drivetrain.addTelemetry();
             shooter.addTelemetry();
             wobble.addTelemetry();
+            
+            telemetry.addData("Left Stick X", gamepad1.left_stick_x);
+            telemetry.addData("Left Stick Y", gamepad1.left_stick_y);
+            telemetry.addData("Right Stick X", gamepad1.right_stick_x);
             telemetry.addData("Time", runtime.seconds());
             
             telemetry.update();
