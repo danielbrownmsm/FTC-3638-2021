@@ -26,6 +26,14 @@ public class AtomicMotor {
     public void setPower(double power) {
         motor.setPower(power);
     }
+
+    public double getVelocity() {
+        return motor.getVelocity();
+    }
+
+    public void setVelocity(double velocity) {
+        motor.setVelocity(velocity);
+    }
     
     public void setDirection(DcMotor.Direction direction) {
         motor.setDirection(direction);

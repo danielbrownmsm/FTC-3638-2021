@@ -63,35 +63,21 @@ public class AtomicTeleOp2 extends OpMode {
     @Override
     public void loop() {
         try {
-            //if (!halfSpeed) {
-                drivetrain.driveTeleOp(gamepad1.left_stick_x * direction, gamepad1.left_stick_y * direction, gamepad1.right_stick_x); // normal inputs
-            //} else { // halve the inputs
-            //    drivetrain.driveTeleOp(gamepad1.left_stick_x * direction / 2, gamepad1.left_stick_y  * direction / 2, gamepad1.right_stick_x / 2);
-            //}
-            
-            // reverse-direction stuff
-            /*
-            if (gamepad1.back && !wasToggled) {
-                direction *= -1;
-                wasToggled = true;
-            } else if (!gamepad1.back) {
-                wasToggled = false;
-            }
-            */
-
+            drivetrain.driveTeleOp(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x); // normal inputs
+ 
             // wobble goal arm
-            if (gamepad2.dpad_up) {
+            if (gamepad1.dpad_up) {
                 wobble.setArm(Constants.wobbleServoUp);
-            } else if (gamepad2.dpad_left) {
+            } else if (gamepad1.dpad_left) {
                 wobble.setArm(Constants.wobbleServoLeft);
-            } else if (gamepad2.dpad_right) {
+            } else if (gamepad1.dpad_right) {
                 wobble.setArm(Constants.wobbleServoRight);
             }
 
             // wobble goal claw
-            if (gamepad2.x) {
+            if (gamepad1.x) {
                 wobble.setClaw(Constants.wobbleClawClosed);
-            } else if (gamepad2.y) {
+            } else if (gamepad1.y) {
                 wobble.setClaw(Constants.wobbleClawOpen);
             }
             
@@ -105,38 +91,21 @@ public class AtomicTeleOp2 extends OpMode {
             }
 
             // shooter stuff
-            if (gamepad1.a || gamepad2.a) {
-                shooter.shootPID(runtime.seconds());
+            if (gamepad1.a) {
+                shooter.shoot(Constants.targetRPM);
             } else {
-                shooter.warmUp(0);
-            }
-            
-            // move this to top b/c it's drivetrain stuff
-            if (gamepad1.start) {
-                drivetrain.resetEncoders();
-                drivetrain.setHeading();
-                while (!drivetrain.strafeDistance(-16) && !gamepad1.back) {
-                    drivetrain.addTelemetry();
-                    shooter.addTelemetry();
-                    wobble.addTelemetry();
-                    
-                    telemetry.update();
-                }
-                drivetrain.setHeading();
-                while (!drivetrain.turnToHeading(-30) && !gamepad1.back) {
-                    drivetrain.addTelemetry();
-                    shooter.addTelemetry();
-                    wobble.addTelemetry();
-                    
-                    telemetry.update();
-                }
+                shooter.shoot(0);
             }
 
-            shooter.setTrigger(gamepad1.right_trigger - gamepad1.left_trigger + gamepad2.right_trigger - gamepad2.left_trigger);
+            shooter.setTrigger(gamepad1.right_trigger - gamepad1.left_trigger);
 
             drivetrain.addTelemetry();
             shooter.addTelemetry();
             wobble.addTelemetry();
+            
+            telemetry.addData("Left Stick X", gamepad1.left_stick_x);
+            telemetry.addData("Left Stick Y", gamepad1.left_stick_y);
+            telemetry.addData("Right Stick X", gamepad1.right_stick_x);
             telemetry.addData("Time", runtime.seconds());
             
             telemetry.update();
@@ -153,5 +122,4 @@ public class AtomicTeleOp2 extends OpMode {
     @Override
     public void stop() {
     }
-
 }

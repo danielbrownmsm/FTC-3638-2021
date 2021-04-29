@@ -63,22 +63,8 @@ public class AtomicTeleOp extends OpMode {
     @Override
     public void loop() {
         try {
-            //if (!halfSpeed) {
-                drivetrain.driveTeleOp(gamepad1.left_stick_x * direction, gamepad1.left_stick_y * direction, gamepad1.right_stick_x); // normal inputs
-            //} else { // halve the inputs
-            //    drivetrain.driveTeleOp(gamepad1.left_stick_x * direction / 2, gamepad1.left_stick_y  * direction / 2, gamepad1.right_stick_x / 2);
-            //}
-            
-            // reverse-direction stuff
-            /*
-            if (gamepad1.back && !wasToggled) {
-                direction *= -1;
-                wasToggled = true;
-            } else if (!gamepad1.back) {
-                wasToggled = false;
-            }
-            */
-
+            drivetrain.driveTeleOp(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x); // normal inputs
+ 
             // wobble goal arm
             if (gamepad1.dpad_up) {
                 wobble.setArm(Constants.wobbleServoUp);
@@ -106,30 +92,9 @@ public class AtomicTeleOp extends OpMode {
 
             // shooter stuff
             if (gamepad1.a) {
-                shooter.shootPID(runtime.seconds());
+                shooter.shoot(Constants.targetRPM);
             } else {
-                shooter.warmUp(0);
-            }
-            
-            // move this to top b/c it's drivetrain stuff
-            if (gamepad1.start) {
-                drivetrain.resetEncoders();
-                drivetrain.setHeading();
-                while (!drivetrain.strafeDistance(-16) && !gamepad1.back) {
-                    drivetrain.addTelemetry();
-                    shooter.addTelemetry();
-                    wobble.addTelemetry();
-                    
-                    telemetry.update();
-                }
-                drivetrain.setHeading();
-                while (!drivetrain.turnToHeading(-30) && !gamepad1.back) {
-                    drivetrain.addTelemetry();
-                    shooter.addTelemetry();
-                    wobble.addTelemetry();
-                    
-                    telemetry.update();
-                }
+                shooter.shoot(0);
             }
 
             shooter.setTrigger(gamepad1.right_trigger - gamepad1.left_trigger);

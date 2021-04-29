@@ -11,43 +11,45 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class ShooterSubsystem {
     private CRServoImplEx trigger;
+    private ServoImplEx shooterPos1;
+    private ServoImplEx shooterPos2;
+    private AtomicMotor shooter1;
+    private AtomicMotor shooter2;
+
     private ServoImplEx intake;
-    private AtomicMotor shooter;
 
     private Telemetry telemetry;
-    
-    private double lastPosition;
-    private double currentPosition;
-    private double lastTime;
-    private double currentTime;
-    private double currentVelocity;
-    private double lastVelocity;
 
     public ShooterSubsystem(Telemetry telemetry) {
         this.telemetry = telemetry;
     }
 
     public void init(HardwareMap map) {
-        shooter = new AtomicMotor(map.get(DcMotorImplEx.class, "shooter"));
-        shooter.init();
-        shooter.setDirection(DcMotorSimple.Direction.REVERSE);
-        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooter1 = new AtomicMotor(map.get(DcMotorImplEx.class, "shooter1"));
+        shooter2 = new AtomicMotor(map.get(DcMotorImplEx.class, "shooter2"));
+
+        shooter1.init();
+        shooter2.init();
+        
+        shooter1.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
+        
+        shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         trigger = map.get(CRServoImplEx.class, "trigger");
         trigger.setPower(0);
         trigger.setDirection(DcMotorSimple.Direction.REVERSE);
         
         intake = map.get(ServoImplEx.class, "intake");
+
+        shooterPos1 = map.get(ServoImplEx.class, "shooterPos1");
+        shooterPos2 = map.get(ServoImplEx.class, "shooterPos1");
     }
 
-    public void warmUp(double power) {
-        shooter.setPower(power);
-    }
-
-    public void shoot(double power) {
-        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooter.setPower(power);
-        //trigger.setPower(power);
+    public void setAngle(double angle) {
+        shooterPos1.setPosition(angle);
+        shooterPos2.setPosition(angle);
     }
     
     public void setTrigger(double power) {
@@ -58,35 +60,23 @@ public class ShooterSubsystem {
         intake.setPosition(pos);
     }
     
-    public double getVelocity(double currentTime) { // ticks / second
-        currentPosition = shooter.getCurrentPosition();
-        currentVelocity = (currentPosition - lastPosition) / (currentTime - lastTime); // both should eval to minus so in the end its a positive
-        
-        lastPosition = currentPosition;
-        lastTime = currentTime;
-        lastVelocity = currentVelocity;
-        
-        return currentVelocity / 134.4 * -60; // should be Rots / Sec * 60 so RPM
+    public double getVelocity() { // ticks / second
+        return (shooter1.getVelocity() + shooter2.getVelocity()) / 2;
     }
     
-    public void shootPID(double currTime) {
-        //double power = (Constants.targetRPM - getVelocity(currTime)) * Constants.shoot_kP;
-        //if (power < 0) {
-        //    power = 0;
-        //}
-        getVelocity(currTime);
-        shooter.setPower(1);
+    public void shoot(double power) {
+        shooter1.setVelocity(power);
+        shooter2.setVelocity(power);
     }
     
     public boolean isShooterGood() {
-        return Math.abs(Constants.targetRPM - lastVelocity) < 100; // we want to be within 100 RPM of the setpoint
+        return Math.abs(Constants.targetRPM - getVelocity()) < 100; // we want to be within 100 RPM of the setpoint
     }
     
     public void addTelemetry() {
         telemetry.addData("Shooter good", isShooterGood());
-        telemetry.addData("Velocity", lastVelocity / 134.4 * -60);
+        telemetry.addData("Velocity", getVelocity());
         telemetry.addData("Intake Position", intake.getPosition());
-        //telemetry.addData("==============");
+        telemetry.addData("Shooter Position", shooterPos1.getPosition());
     }
-
-} 
+}
