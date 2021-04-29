@@ -20,6 +20,8 @@ public class AtomicTeleOp extends OpMode {
     private ShooterSubsystem shooter = new ShooterSubsystem(telemetry);
     
     private int direction = 1;
+    private double servo1Pos = 0.7;
+    private double servo2Pos = 0;
     private boolean wasToggled = false;
     private boolean wasHalfSpeedToggled = false;
     private boolean halfSpeed = false;
@@ -86,13 +88,20 @@ public class AtomicTeleOp extends OpMode {
                 shooter.setIntake(Constants.intakeNeutral); // net is 0.2
             } else if (gamepad1.right_bumper) {
                 shooter.setIntake(Constants.intakeDown); // down is 0.7
+                if (servo1Pos > 0.7) {
+                    servo1Pos -= 0.05;
+                }
             } else if (gamepad1.left_bumper) {
                 shooter.setIntake(Constants.intakeUp); // up is 0
+                if (servo1Pos < 0.95) {
+                    servo1Pos += 0.05;
+                }
             }
 
             // shooter stuff
             if (gamepad1.a) {
                 shooter.shoot(Constants.targetRPM);
+                shooter.setAngle(servo1Pos);
             } else {
                 shooter.shoot(0);
             }
@@ -106,6 +115,7 @@ public class AtomicTeleOp extends OpMode {
             telemetry.addData("Left Stick X", gamepad1.left_stick_x);
             telemetry.addData("Left Stick Y", gamepad1.left_stick_y);
             telemetry.addData("Right Stick X", gamepad1.right_stick_x);
+            telemetry.addData("Servo 1 Pos", servo1Pos);
             telemetry.addData("Time", runtime.seconds());
             
             telemetry.update();
